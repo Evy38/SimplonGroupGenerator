@@ -8,14 +8,13 @@
 html, body {
     height: 100%;
     font-family: 'Montserrat', sans-serif;
-    background-color: #f5f5f5; /* Couleur de fond appliquée au body */
+    overflow-x: hidden
 }
 
 body {
     display: flex;
     flex-direction: column; /* Par défaut, pour que .connexion puisse être centré verticalement ET horizontalement */
     justify-content: center; /* Centre .connexion verticalement */
-    align-items: center;     /* Centre .connexion horizontalement */
+    /* align-items: center;    */
     min-height: 100vh;
-    padding: 15px; /* Un peu de padding sur le body pour éviter que .connexion ne colle aux bords */
 }

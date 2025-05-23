@@ -1,0 +1,548 @@
+/* src/app/features/formateur/brief-list/brief-list.component.css */
+/* Styles généraux de la page (similaires à group-list) */
+.page-header { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; }
+.page-header h1 { font-size: 28px; color: #333; font-weight: 600; }
+
+.brief-cards-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Une colonne sur mobile par défaut */
+  gap: 15px;
+  margin-bottom: 70px; /* Espace pour le FAB */
+}
+
+.brief-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Ombre plus discrète */
+  overflow: hidden;
+  display: flex; /* <<< Le parent .brief-card est flex en COLONNE pour que les actions soient en bas */
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease-out;
+}
+
+.brief-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+.brief-card-main-content {
+  /* display: flex; */
+  flex-direction: row; /* Met l'image et le contenu texte côte à côte */
+  align-items: stretch; /* Étire les enfants pour qu'ils aient la même hauteur */
+  padding: 10px; /* Léger padding autour de la zone image+texte */
+  flex-grow: 1; /* Pour qu'il prenne l'espace avant les actions */
+}
+
+.brief-card-image {
+  flex-shrink: 0; /* Empêche l'image de rétrécir */
+  width: 80px;   /* <<<< Largeur de l'image sur mobile */
+  margin-right: 12px; /* Espace entre l'image et le contenu texte */
+  display: flex; /* Pour que l'img prenne toute la place si .brief-card-image a une hauteur */
+  align-items: center; /* Centrer l'image si elle est plus petite que la hauteur de la div */
+}
+.brief-card-image img {
+  width: 100%;
+  height: 100%; /* Fait en sorte que l'image remplisse la div .brief-card-image */
+  object-fit: cover; /* Couvre l'espace sans déformer, peut couper */
+  display: block;
+  border-radius: 6px; /* Coins arrondis pour l'image elle-même */
+}
+
+.brief-card-content {
+  padding: 0; /* Enlever le padding ici, il est sur .brief-card-main-content */
+  flex-grow: 1;     /* Le contenu prend l'espace restant à droite de l'image */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pour espacer titre/description et le groupe assigné */
+  min-width: 0; /* Important pour que le flex-grow fonctionne bien avec du texte qui pourrait déborder */
+}
+.brief-name {
+  font-size: 1em; /* Taille pour mobile */
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 4px 0;
+  white-space: nowrap; /* Empêche le titre de passer à la ligne */
+  overflow: hidden;    /* Cache le dépassement */
+  text-overflow: ellipsis; /* Ajoute "..." si le titre est trop long */
+}
+
+.brief-description {
+  font-size: 0.8em;
+  color: #666;
+  line-height: 1.35;
+  margin: 0 0 6px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limite à 2 lignes pour la description */
+  line-clamp: 2; /* Propriété standard pour la compatibilité */
+  -webkit-box-orient: vertical;
+  /* Pour que webkit-line-clamp fonctionne, la hauteur doit être "auto" ou gérée par le contenu */
+}
+.brief-assigned-group {
+  font-size: 0.75em;
+  color: #888;
+  margin-top: 4px; /* Petit espace si la description prend moins de place */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brief-assigned-group strong {
+  color: #666;
+}
+
+/* Réutiliser .icon-button, .edit-button, .delete-button de group-list ou les définir ici */
+.icon-button { background:none; border:none; font-size:1rem; cursor:pointer; padding:4px 8px; border-radius:4px; transition: background-color 0.2s ease, color 0.2s ease; color: #555; }
+.icon-button:hover { background-color: #e0e0e0; }
+.edit-button:hover { color: #2980b9; }
+.delete-button:hover { color: #c0392b; }
+
+.brief-card-actions {
+  padding: 8px 12px; /* Moins de padding */
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px; /* Moins d'espace entre les icônes */
+  background-color: #f9f9f9; /* Fond un peu plus discret */
+}
+.brief-card-actions img {
+  width: 20px; /* Icônes plus petites sur mobile */
+  height: 20px;
+}
+
+
+
+
+.create-brief-form textarea { /* Style pour le textarea */
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  resize: vertical; /* Permet le redimensionnement vertical */
+  min-height: 80px;
+}
+.create-brief-form select { /* Style pour le select des groupes */
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  background-color: white;
+  /* ... (styles de flèche custom si tu veux comme pour l'autre select) ... */
+}
+
+.fab-button {
+  position: fixed;
+  bottom: 20px; /* Plus proche du bord sur mobile */
+  right: 20px;  /* Plus proche du bord sur mobile */
+  width: 56px;  /* Taille standard FAB mobile */
+  height: 56px;
+  border-radius: 50%;
+  background-color: #4e4db0; /* Garder ta couleur */
+  color: white;
+  font-size: 28px;
+  line-height: 56px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  border: none;
+  cursor: pointer;
+  z-index: 900;
+  transition: transform 0.2s ease-out, background-color 0.2s ease-out;
+}
+.fab-button:hover {
+  background-color: #3a398a; /* Couleur de survol adaptée */
+  transform: scale(1.05);
+}
+
+
+
+
+
+
+
+/* src/app/features/formateur/brief-list/brief-list.component.css */
+
+/* ... (tes styles existants pour .page-header, .brief-cards-container, etc.) ... */
+
+/* --- STYLES POUR LA MODALE DE BRIEF (Création/Modification) --- */
+
+/* Overlay qui couvre tout l'écran */
+.full-screen-modal-overlay {
+  position: fixed; /* Se positionne par rapport à la fenêtre du navigateur */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Toute la largeur de la fenêtre */
+  height: 100vh; /* Toute la hauteur de la fenêtre */
+  background-color: rgba(0, 0, 0, 0.65); /* Fond noir semi-transparent, un peu plus opaque */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* TRÈS IMPORTANT: Doit être supérieur au z-index de la sidebar (ex: 100) et du FAB (ex: 900) */
+  padding: 20px; /* Pour que la modale ne colle pas aux bords sur très petits écrans */
+  box-sizing: border-box; /* S'assurer que le padding est inclus dans width/height */
+}
+
+/* Contenu de la modale */
+.large-modal-content.brief-modal-content { /* Tu peux utiliser juste .brief-modal-content si tu préfères */
+  background-color: #ffffff;
+  padding: 25px 30px; /* Ajuste le padding intérieur */
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 650px; /* Largeur de la modale pour les briefs */
+  position: relative; /* Pour positionner le bouton de fermeture à l'intérieur */
+  max-height: 90vh; /* Limite la hauteur et active le scroll si besoin */
+  overflow-y: auto; /* Permet le défilement si le contenu du formulaire est long */
+  display: flex; /* Pour mieux contrôler la structure interne si besoin */
+  flex-direction: column;
+}
+
+/* Bouton de fermeture de la modale */
+.modal-close-button {
+  position: absolute;
+  top: 12px; /* Ajuste pour un bon placement */
+  right: 15px; /* Ajuste pour un bon placement */
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: bold;
+  color: #777; /* Un peu plus discret */
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px; /* Augmente la zone cliquable */
+}
+.modal-close-button:hover {
+  color: #333;
+}
+
+/* Header de la modale */
+.modal-header {
+  text-align: center;
+  margin-bottom: 20px; /* Moins d'espace si le titre est plus court */
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eaeaea;
+  width: 100%; /* S'assurer qu'il prend toute la largeur du .modal-content */
+}
+.modal-header h2 {
+  font-size: 22px;
+  color: #2c3e50;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Styles pour le formulaire dans la modale */
+.modal-form.create-brief-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Espace entre les .form-group */
+  flex-grow: 1; /* Pour qu'il prenne l'espace vertical disponible avant les boutons */
+}
+
+.create-brief-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-brief-form .form-group label {
+  font-weight: 500;
+  margin-bottom: 7px;
+  font-size: 0.95em; /* Légèrement plus petit */
+  color: #454545;
+}
+
+.create-brief-form input[type="text"],
+.create-brief-form input[type="url"],
+.create-brief-form textarea,
+.create-brief-form select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ced4da; /* Bordure standard */
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.create-brief-form input[type="text"]:focus,
+.create-brief-form input[type="url"]:focus,
+.create-brief-form textarea:focus,
+.create-brief-form select:focus {
+  border-color: #14343c; /* Couleur principale au focus */
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(20, 52, 60, 0.2); /* Ombre au focus */
+}
+
+.create-brief-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.create-brief-form select {
+  appearance: none; /* Pour styler la flèche custom si désiré */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c757d%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22/%3E%3C/svg%3E');
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 10px 10px;
+  padding-right: 35px; /* Espace pour la flèche custom */
+}
+
+
+/* Messages d'erreur/succès */
+.error-message {
+  /* ... (tes styles existants) ... */
+  margin: 10px 0 0 0; /* Ajuster la marge si besoin */
+}
+.success-message {
+  /* ... (tes styles existants) ... */
+  margin: 10px 0 0 0;
+}
+
+/* Boutons dans la modale */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px; /* Espace avant les boutons */
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0; /* Séparateur avant les boutons */
+  width: 100%;
+}
+
+
+.button-primary {
+  /* ... (tes styles existants ou à définir) ... */
+  background-color: #14343c; color: white; padding: 10px 20px; border:none; border-radius: 6px; font-weight: 500; font-size: 0.95em; cursor: pointer;
+}
+.button-primary:hover { background-color: #0d2329; }
+
+.button-secondary {
+  /* ... (tes styles existants ou à définir) ... */
+  background-color: #6c757d; color: white; padding: 10px 20px; border:none; border-radius: 6px; font-weight: 500; font-size: 0.95em; cursor: pointer;
+}
+.button-secondary:hover { background-color: #5a6268; }
+
+
+
+
+
+.confirm-delete-modal-overlay { /* Cible l'overlay spécifique */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65); /* Fond semi-transparent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1070; /* S'assurer qu'il est bien au-dessus des autres éléments */
+  padding: 20px; /* Pour éviter que la modale ne colle aux bords */
+  box-sizing: border-box;
+}
+
+.confirm-delete-modal-content { /* Cible le contenu spécifique de cette modale */
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.22);
+  width: 100%;
+  max-width: 420px; /* Modale de confirmation plus petite */
+  position: relative; /* Pour un éventuel bouton de fermeture absolu */
+  text-align: center; /* Centrer le contenu */
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espace entre header, body, footer */
+}
+
+/* Si tu ajoutes un bouton de fermeture <button class="modal-close-button">...</button>
+   à l'intérieur de .confirm-delete-modal-content : */
+.confirm-delete-modal-content .modal-close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+.confirm-delete-modal-content .modal-close-button:hover {
+  color: #555;
+}
+
+
+/* Header de la modale de confirmation */
+.confirm-delete-modal-content .modal-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 10px; /* Moins d'espace si pas de sous-titre */
+}
+.confirm-delete-modal-content .modal-header h2 {
+  font-size: 20px;
+  color: #c0392b;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Corps de la modale de confirmation */
+/* Pas de style spécifique ici si <p> suffit */
+.confirm-delete-modal-content .modal-body p {
+  margin-bottom: 12px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #444;
+}
+.confirm-delete-modal-content .modal-body strong { /* Pour le nom du brief */
+  color: #14343c; /* Couleur principale pour l'emphase */
+  font-weight: 600; /* S'assurer qu'il est bien en gras */
+}
+.confirm-delete-modal-content .warning-text { /* Ta classe spécifique */
+  font-size: 0.9em;
+  color: #d9534f; /* Rouge pour l'avertissement */
+  font-weight: 500;
+  margin-top: 15px;
+}
+
+/* Footer / Conteneur des boutons */
+.confirm-delete-modal-content .modal-footer.buttons.confirm-delete-buttons {
+  display: flex;
+  justify-content: center; /* Centrer les boutons */
+  gap: 15px; /* Espace entre les boutons */
+  margin-top: 20px; /* Espace avant les boutons */
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+  width: 100%; /* Pour que la bordure prenne toute la largeur */
+}
+
+/* Styles pour les boutons dans cette modale spécifique */
+.confirm-delete-buttons .button-secondary {
+  background-color: #6c757d; /* Gris standard */
+  color: white;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95em;
+  cursor: pointer;
+  min-width: 100px; /* Pour une taille minimale cliquable */
+  transition: background-color 0.2s ease;
+}
+.confirm-delete-buttons .button-secondary:hover {
+  background-color: #5a6268;
+}
+
+.confirm-delete-buttons .button-danger {
+  background-color: #d9534f; /* Rouge "danger" */
+  color: white;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95em;
+  cursor: pointer;
+  min-width: 100px;
+  transition: background-color 0.2s ease;
+}
+.confirm-delete-buttons .button-danger:hover {
+  background-color: #c9302c; /* Rouge plus foncé */
+}
+
+
+
+
+
+@media (min-width: 768px) {
+
+  .brief-card-main-content {
+    display: block;
+  }
+
+   .modal-content.brief-modal-content {
+    max-width: 750px; /* Un peu plus large sur desktop */
+    padding: 35px 45px;
+  }
+  .modal-header h2 {
+    font-size: 24px;
+  }
+  .create-brief-form input[type="text"],
+  .create-brief-form input[type="url"],
+  .create-brief-form textarea,
+  .create-brief-form select {
+    padding: 12px 15px; /* Un peu plus de padding dans les champs */
+  }
+  .button-primary, .button-secondary {
+    font-size: 1em;
+    padding: 12px 25px;
+  }
+  .page-header h1 {
+    font-size: 28px; /* Titre de page standard pour desktop */
+  }
+
+  .brief-cards-container {
+    /* Plusieurs colonnes, ex: 2 ou 3 selon la place que tu veux par carte */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Cartes plus larges */
+    gap: 25px;
+  }
+
+  .brief-card {
+    flex-direction: column; /* Revenir à : Image en haut, contenu en dessous */
+    /* align-items: initial; // Plus besoin si flex-direction est column */
+    border-radius: 12px;
+  }
+
+  .brief-card-image {
+    width: 100%; /* L'image prend toute la largeur de la carte */
+    height: 180px; /* Hauteur d'image pour desktop */
+    /* margin-right: 0; // Plus besoin */
+  }
+  .brief-card-image img {
+    border-radius: 12px 12px 0 0; /* Coins arrondis seulement en haut */
+  }
+
+  .brief-card-content {
+    padding: 20px; /* Plus de padding pour desktop */
+    justify-content: space-between; /* Assure que 'assigned-group' reste en bas si possible */
+    min-height: 150px; /* Donner une hauteur min pour aligner les cartes si contenu variable */
+  }
+
+  .brief-name {
+    font-size: 1.25em;
+    white-space: normal; /* Permettre le retour à la ligne pour le titre */
+    overflow: visible;
+    text-overflow: clip;
+    margin-bottom: 10px;
+  }
+
+  .brief-description {
+    font-size: 0.9em;
+    line-height: 1.5;
+    -webkit-line-clamp: 3; /* Permettre 3 lignes pour la description */
+    line-clamp: 3;
+    margin-bottom: 12px;
+  }
+
+  .brief-assigned-group {
+    font-size: 0.85em;
+  }
+
+  .brief-card-actions {
+    padding: 12px 20px;
+    gap: 12px;
+  }
+  .icon-button { /* Augmenter la taille des icônes pour desktop */
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+  }
+
+
+}

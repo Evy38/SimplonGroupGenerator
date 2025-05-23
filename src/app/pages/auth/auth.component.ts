@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // Ajoute CommonModule pour @if, etc.
+import { Router } from '@angular/router'; // <<< IMPORT Router
+import { AuthService } from '../../core/services/auth.service'; // <<< IMPORT AuthService (vérifie bien ce chemin)
 
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [FormsModule, ],
+  imports: [FormsModule, CommonModule ],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css' 
 })
@@ -50,19 +53,33 @@ export class AuthComponent {
   registerError: string | null = null;
   registerSuccess: string | null = null;
 
-  constructor() {}
+constructor(
+  private authService: AuthService,
+  private router: Router
+) {}
 
   // --- MÉTHODES POUR LA CONNEXION (restent les mêmes) ---
-  onLoginSubmit(): void {
+ onLoginSubmit(): void {
+    console.log('onLoginSubmit a été appelée !'); // PREMIER POINT DE DÉBOGAGE
     this.loginError = null;
-    console.log('Données de connexion soumises :', this.loginData);
-    // ... (Logique de simulation de connexion)
-    if (this.loginData.email === 'formateur@test.com' && this.loginData.password === 'password') {
-      console.log('Connexion réussie en tant que formateur !');
-    } else if (this.loginData.email === 'apprenant@test.com' && this.loginData.password === 'password') {
-      console.log('Connexion réussie en tant qu\'apprenant !');
+    const success = this.authService.login(this.loginData.email, this.loginData.password);
+
+    console.log('Résultat de authService.login:', success); // DEUXIÈME POINT DE DÉBOGAGE
+
+    if (success) {
+      const currentUser = this.authService.currentUserValue;
+      console.log('Utilisateur connecté:', currentUser); // TROISIÈME POINT DE DÉBOGAGE
+
+      if (currentUser?.role === 'formateur') {
+        this.router.navigate(['/formateur']);
+      } else if (currentUser?.role === 'apprenant') {
+        this.router.navigate(['/apprenant']);
+      } else {
+        this.router.navigate(['/']);
+      }
     } else {
       this.loginError = 'Email ou mot de passe incorrect.';
+      console.log('Échec de la tentative de connexion.');
     }
   }
 

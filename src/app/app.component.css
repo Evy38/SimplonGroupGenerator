@@ -1,0 +1,36 @@
+/* styles.css ou styles.scss (global) */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* app.component.css ou le CSS du composant conteneur */
+.app-container {
+  display: flex; /* Aligne la sidebar et le main-content côte à côte */
+  height: 100vh; /* Prend toute la hauteur de la vue */
+}
+
+app-sidebar {
+  flex-shrink: 0;
+}
+.main-content {
+  flex-grow: 1;
+  background-color: #ffffff;
+  /* padding: 20px; */ /* Temporairement commenté */
+  overflow-y: auto;
+}
+
+.main-content-wrapper { /* L'élément qui prend le flex-grow */
+  flex-grow: 1;
+  background-color: #ffffff; /* Le fond blanc est ici */
+  overflow-y: auto; /* Permet le scroll si actual-content-area est trop haut */
+}
+
+.actual-content-area { /* Le contenu réel avec padding */
+  padding: 20px; /* Ton padding désiré */
+}
+:host {
+  display: block; /* Permet au composant racine de se comporter comme un bloc */
+  height: 100vh;  /* Ou 100% si html, body sont à 100% */
+}

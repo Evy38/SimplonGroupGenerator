@@ -1,0 +1,235 @@
+/* src/app/features/formateur/brief-detail/brief-detail.component.css */
+.brief-detail-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.brief-detail-header h1 {
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+.back-to-list-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+.back-to-list-link:hover {
+  text-decoration: underline;
+}
+.brief-detail-image {
+  max-width: 100%;
+  max-height: 350px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  object-fit: cover;
+  display: block;
+}
+.brief-detail-description {
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 15px;
+  white-space: pre-wrap; /* Respecte les sauts de ligne de la description */
+}
+.brief-promo-info {
+  font-size: 0.95em;
+  color: #777;
+  margin-top: 10px;
+}
+
+.associated-groups-section {
+  margin-top: 40px;
+}
+.associated-groups-section h2 {
+  font-size: 1.5em;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Styles pour les cartes de groupe sur cette page (peuvent être plus compactes) */
+.group-cards-container.compact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Cartes un peu plus petites */
+  gap: 20px;
+  margin-bottom: 80px; /* Pour le FAB */
+}
+
+.group-card.compact-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Image en haut, contenu en bas */
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.group-card.compact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.group-card-image.compact-image img {
+  width: 100%;
+  height: 130px; /* Hauteur d'image pour les cartes compactes */
+  object-fit: cover;
+}
+
+.group-card-content.compact-content {
+  padding: 15px;
+  text-align: center; /* Centrer le contenu de la petite carte */
+}
+.group-card-content.compact-content .group-name {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.group-card-content.compact-content .group-members-count {
+  font-size: 0.85em;
+  color: #7f8c8d;
+}
+/* .view-group-link { ... } */
+
+
+.empty-list-message, .loading-message {
+  padding: 30px;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+/* Bouton Flottant "Dé" */
+.fab-button.dice-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;  /* Taille du cercle du bouton */
+  height: 60px; /* Taille du cercle du bouton */
+  border: none;
+  cursor: pointer;
+  z-index: 950;
+  display: flex; /* Pour centrer l'image à l'intérieur */
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Enlève le padding par défaut du bouton si l'image prend toute la place */
+  transition: transform 0.1s ease-out; /* Transition plus douce pour la rotation */
+  background-color: transparent;
+}
+
+.fab-button.dice-fab img {
+  width: 70px;  /* Taille de ton image de dé à l'intérieur du bouton */
+  height: 70px; /* Taille de ton image de dé à l'intérieur du bouton */
+  display: block; /* Pour éviter tout espace supplémentaire sous l'image */
+}
+
+.fab-button.dice-fab:hover {
+  transform: scale(1.1) rotate(45deg); /* Agrandissement léger et rotation au survol */
+}
+
+.fab-button.dice-fab:active { /* Effet au clic */
+  transform: scale(1.0) rotate(15deg); /* Légère réduction et rotation pour l'effet "pressé" */
+}
+
+/* Styles pour la modale de génération de groupes */
+/* Tu peux réutiliser .full-screen-modal-overlay, .large-modal-content, .modal-header, etc.
+   que tu as définis pour les autres modales, ou créer des classes spécifiques.
+   Assure-toi que le z-index de la modale est supérieur à celui du FAB. */
+.generate-groups-modal .modal-header p {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+
+
+/* --- STYLES POUR LA MODALE DES MEMBRES D'UN GROUPE --- */
+.members-modal-overlay { /* Peut réutiliser .modal-overlay si le style est identique */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1060; /* Au-dessus du FAB, potentiellement en dessous de la modale de génération si elle peut s'ouvrir par-dessus */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.members-modal-content { /* Peut réutiliser .modal-content si le style est identique */
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 550px; /* Taille pour la liste des membres */
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* .members-modal-content .modal-close-button { ... réutiliser ou styler ... } */
+/* .members-modal-content .modal-header { ... réutiliser ou styler ... } */
+/* .members-modal-content .modal-footer { ... réutiliser ou styler ... } */
+
+
+.members-list-body {
+  padding: 10px 0;
+  flex-grow: 1; /* Pour que la liste prenne l'espace si la modale a une hauteur fixe */
+}
+
+.members-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.member-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.member-item:last-child {
+  border-bottom: none;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #2c3e50;
+  display: block; /* Pour qu'il prenne sa ligne */
+  margin-bottom: 5px;
+  font-size: 1.05em;
+}
+
+.member-details {
+  font-size: 0.9em;
+  color: #555;
+  line-height: 1.5;
+}
+
+.member-detail {
+  display: block; /* Chaque détail sur une nouvelle ligne (ou inline-block avec des marges) */
+  margin-left: 10px; /* Petite indentation pour les détails */
+  font-size: 0.9em;
+  color: #666;
+}
+.member-detail:not(:last-child) {
+  margin-bottom: 3px;
+}
+
+/* --- STYLES POUR LA MODALE DE GÉNÉRATION DE GROUPES (précisions) --- */
+.generate-groups-modal .criteria-title {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}

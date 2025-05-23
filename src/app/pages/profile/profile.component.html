@@ -1,0 +1,15 @@
+<div class="profile-container">
+  <h1>Mon Profil</h1>
+  <ng-container *ngIf="currentUser; else noUser">
+    <div class="profile-details">
+      <p><strong>Nom :</strong> {{ currentUser.name }}</p>
+      <p><strong>Email :</strong> {{ currentUser.email }}</p>
+      <p><strong>Rôle :</strong> {{ currentUser.role }}</p>
+      <!-- Ajoute d'autres informations du profil ici -->
+    </div>
+    <!-- Tu pourrais ajouter un formulaire pour modifier le profil ici -->
+  </ng-container>
+  <ng-template #noUser>
+    <p>Impossible de charger les informations du profil. Veuillez vous connecter.</p>
+  </ng-template>
+</div>

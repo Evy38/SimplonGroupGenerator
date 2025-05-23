@@ -25,7 +25,8 @@
                     <p class="error-message">{{ loginError }}</p>
                 }
                 <div class="buttons">
-                    <button type="submit">Se connecter</button>
+                    <!-- Ce bouton doit soumettre le formulaire -->
+                    <button type="submit" (click)="onLoginSubmit()">Se connecter</button>
                     <!-- Ce bouton ouvre la modale -->
                     <button type="button" (click)="openRegisterModal()">S'inscrire</button>
                 </div>

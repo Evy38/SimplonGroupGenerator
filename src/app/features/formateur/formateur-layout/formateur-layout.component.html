@@ -1,0 +1,11 @@
+<div class="formateur-layout-container">
+    <button type="button" class="sidebar-toggle-button" (click)="toggleSidebar()">
+        {{ isSidebarOpen ? '✕' : '☰' }} <!-- Change l'icône -->
+    </button>
+
+    <app-sidebar class="formateur-sidebar" [class.open]="isSidebarOpen"></app-sidebar>
+
+    <main class="formateur-content">
+        <router-outlet></router-outlet>
+    </main>
+</div>

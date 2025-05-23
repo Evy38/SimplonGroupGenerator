@@ -1,0 +1,155 @@
+<!-- src/app/features/formateur/brief-detail/brief-detail.component.html -->
+@if (brief) {
+  <header class="page-header brief-detail-header">
+    <!-- ... (contenu du header du brief inchangé) ... -->
+    <a routerLink="/formateur/briefs" class="back-to-list-link">← Retour aux briefs</a>
+    <h1>{{ brief.name }}</h1>
+    @if (brief.imageUrl) {
+      <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.name" class="brief-detail-image">
+    }
+    <p class="brief-detail-description">{{ brief.description }}</p>
+    <p class="brief-promo-info"><em>Basé sur la promo : {{ brief.peopleListId || 'Non définie' }}</em></p>
+  </header>
+
+  <section class="associated-groups-section">
+    <h2>Groupes Actuellement Associés à ce Brief</h2>
+    @if (associatedGroups.length > 0) {
+      <div class="group-cards-container compact-cards">
+        @for (group of associatedGroups; track group.id) {
+          <!-- Carte de groupe cliquable pour voir les membres -->
+          <div class="group-card compact-card" (click)="openMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
+            @if (group.imageUrl) {
+              <div class="group-card-image compact-image">
+                <img [src]="group.imageUrl" [alt]="'Image pour ' + group.name">
+              </div>
+            }
+            <div class="group-card-content compact-content">
+              <h4 class="group-name">{{ group.name }}</h4>
+              <p class="group-members-count">{{ group.members.length }} membre(s)</p>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="empty-list-message">Aucun groupe n'est assigné à ce brief pour le moment.</p>
+    }
+  </section>
+
+  <!-- Bouton Flottant "Dé" (inchangé) -->
+  <button type="button" class="fab-button dice-fab" (click)="openGenerateGroupsModal()" title="Générer/Assigner des groupes pour ce brief">
+    <img src="assets/dés.png" alt="Générer groupes">
+  </button>
+
+  <!-- MODALE POUR VOIR LES MEMBRES D'UN GROUPE -->
+  @if (isMembersModalOpen && selectedGroupForMembers) {
+    <div class="modal-overlay members-modal-overlay" (click)="closeMembersModal()">
+      <div class="modal-content members-modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close-button" (click)="closeMembersModal()" aria-label="Fermer">×</button>
+        <div class="modal-header">
+          <h2>Membres du groupe : {{ selectedGroupForMembers.name }}</h2>
+        </div>
+        <div class="modal-body members-list-body">
+          @if (selectedGroupForMembers.members && selectedGroupForMembers.members.length > 0) {
+            <ul class="members-ul">
+              @for (member of selectedGroupForMembers.members; track member.id) {
+                <li class="member-item">
+                  <span class="member-name">{{ member.nom }}</span>
+                  <div class="member-details">
+                    @if (member.email) { <span class="member-detail">Email: {{ member.email }}</span> }
+                    @if (member.genre) { <span class="member-detail">Genre: {{member.genre}}</span> }
+                    @if (member.aisanceFrancais) { <span class="member-detail">Français: N{{member.aisanceFrancais}}</span> }
+                    @if (member.ancienDWWM !== undefined) { <span class="member-detail">Ancien DWWM: {{member.ancienDWWM ? 'Oui' : 'Non'}}</span> }
+                    @if (member.niveauTechnique) { <span class="member-detail">N. Tech: N{{member.niveauTechnique}}</span> }
+                    @if (member.profil) { <span class="member-detail">Profil: {{member.profil}}</span> }
+                    @if (member.age) { <span class="member-detail">Âge: {{member.age}}</span> }
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p>Aucun membre dans ce groupe.</p>
+          }
+        </div>
+        <div class="modal-footer buttons">
+          <button type="button" class="button-secondary" (click)="closeMembersModal()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODALE DE GÉNÉRATION DE GROUPES (inchangée pour l'instant, sauf le contenu du formulaire) -->
+ <!-- MODALE DE GÉNÉRATION DE GROUPES -->
+@if (isGenerateGroupsModalOpen && brief) {
+  <div class="modal-overlay full-screen-modal-overlay" (click)="closeGenerateGroupsModal()">
+    <div class="modal-content large-modal-content generate-groups-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close-button" (click)="closeGenerateGroupsModal()" aria-label="Fermer">×</button>
+      <div class="modal-header">
+        <h2>Générer des Groupes pour "{{ brief.name }}"</h2>
+        @if(brief.peopleListId) { <p>À partir de la promo : <strong>{{ brief.peopleListId }}</strong></p> }
+      </div>
+
+      <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()">
+        <div class="form-group">
+          <label for="gen-num-groups">Nombre de personnes par groupe :</label>
+          <input type="number" id="gen-num-groups" name="genNumGroups"
+                 [(ngModel)]="generationFormData.numberOfGroups" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="gen-group-base-name">Nom de base pour les groupes (sera suivi de 1, 2...) :</label>
+          <input type="text" id="gen-group-base-name" name="genGroupBaseName"
+                 [(ngModel)]="generationFormData.groupBaseName" placeholder="Ex: Équipe Alpha" required>
+        </div>
+
+        <h4 class="criteria-title">Critères de Mixité (Cahier des Charges)</h4>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-dwwm" name="critereDwwm"
+                 [(ngModel)]="generationFormData.mixAncienDWWM">
+          <label for="critere-dwwm">Mixer les anciens DWWM</label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-genre" name="critereGenre"
+                 [(ngModel)]="generationFormData.mixGenre">
+          <label for="critere-genre">Mixer les genres</label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-francais" name="critereFrancais"
+                 [(ngModel)]="generationFormData.mixAisanceFrancais">
+          <label for="critere-francais">Mixer par aisance en Français</label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-tech" name="critereTech"
+                 [(ngModel)]="generationFormData.mixNiveauTechnique">
+          <label for="critere-tech">Mixer par niveau technique</label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-profil" name="critereProfil"
+                 [(ngModel)]="generationFormData.mixProfil">
+          <label for="critere-profil">Mixer les profils (timide, réservé, à l'aise)</label>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="critere-age" name="critereAge"
+                 [(ngModel)]="generationFormData.mixAge">
+          <label for="critere-age">Mixer les âges</label>
+        </div>
+
+        <!-- Tu pourrais ajouter un input pour le nombre de personnes par groupe si le CdC le sous-entendait -->
+
+        <div class="buttons modal-buttons">
+          <button type="button" class="button-secondary" (click)="closeGenerateGroupsModal()">Annuler</button>
+          <button type="submit" class="button-primary">Lancer la Génération</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+} @else {
+  <p class="loading-message">Chargement des détails du brief...</p>
+}
