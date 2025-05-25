@@ -1,57 +1,136 @@
 <!-- src/app/features/formateur/brief-detail/brief-detail.component.html -->
 @if (brief) {
+  <!-- SECTION HEADER: Affiche les détails du brief -->
   <header class="page-header brief-detail-header">
-    <!-- ... (contenu du header du brief inchangé) ... -->
-    <a routerLink="/formateur/briefs" class="back-to-list-link">← Retour aux briefs</a>
+    <a routerLink="/formateur/briefs" class="back-to-list-link">← Retour à la liste des briefs</a>
     <h1>{{ brief.name }}</h1>
     @if (brief.imageUrl) {
       <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.name" class="brief-detail-image">
     }
     <p class="brief-detail-description">{{ brief.description }}</p>
-    <p class="brief-promo-info"><em>Basé sur la promo : {{ brief.peopleListId || 'Non définie' }}</em></p>
+     <!-- AFFICHER LE NOM DE LA PROMO SOURCE -->
+    <p class="brief-promo-info">
+      <em>Promo source pour la génération :
+        <strong>
+          {{ sourceGroupForBrief?.name || (brief.sourceGroupId ? 'Promo ID: ' + brief.sourceGroupId : 'Non définie') }}
+        </strong>
+        @if (sourceGroupForBrief && sourceGroupForBrief.members) {
+          ({{ sourceGroupForBrief.members.length }} personnes)
+        }
+      </em>
+    </p>
   </header>
 
-  <section class="associated-groups-section">
-    <h2>Groupes Actuellement Associés à ce Brief</h2>
-    @if (associatedGroups.length > 0) {
-      <div class="group-cards-container compact-cards">
-        @for (group of associatedGroups; track group.id) {
-          <!-- Carte de groupe cliquable pour voir les membres -->
-          <div class="group-card compact-card" (click)="openMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
-            @if (group.imageUrl) {
-              <div class="group-card-image compact-image">
-                <img [src]="group.imageUrl" [alt]="'Image pour ' + group.name">
+  <!-- SECTION AFFICHAGE DES GROUPES DE TRAVAIL GÉNÉRÉS -->
+  <section class="generated-work-groups-section">
+    <h2>Sous-Groupes de Travail Générés</h2>
+    @if (generatedWorkGroups.length > 0) {
+      <div class="work-group-list-container">
+        @for (group of generatedWorkGroups; track group.id) {
+          <div class="work-group-card">
+            <div class="work-group-header" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}"> <!-- Cliquable pour voir membres -->
+              <h4 class="work-group-name">{{ group.name }}</h4>
+              <div class="work-group-actions">
+                <button type="button" class="icon-button simple-edit-button" title="Modifier ce sous-groupe"
+                        (click)="openEditWorkGroupModal(group, $event)">
+                    <img src="assets/pen.png" alt="Modifier">
+                </button>
+                <button type="button" class="icon-button simple-delete-button" title="Supprimer ce sous-groupe"
+                        (click)="openDeleteWorkGroupConfirmModal(group, $event)">
+                    <img src="assets/trash.png" alt="Supprimer">
+                </button>
               </div>
-            }
-            <div class="group-card-content compact-content">
-              <h4 class="group-name">{{ group.name }}</h4>
-              <p class="group-members-count">{{ group.members.length }} membre(s)</p>
             </div>
+            <ul class="work-group-members-list" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}"> <!-- Cliquable pour voir membres -->
+              @for (member of group.members; track member.id; let count = $count) {
+                @if ($index < 3) { <!-- Afficher max 3 noms directement -->
+                  <li class="member-name-item">{{ member.nom }}</li>
+                }
+              }
+              @if (group.members.length > 3) {
+                <li class="member-name-item more-members">... et {{ group.members.length - 3 }} autre(s)</li>
+              }
+            </ul>
+             @if (group.members.length === 0) {
+                <p class="no-members-in-card">Aucun membre</p>
+             }
           </div>
         }
       </div>
     } @else {
-      <p class="empty-list-message">Aucun groupe n'est assigné à ce brief pour le moment.</p>
+      <p class="empty-list-message">Aucun sous-groupe de travail généré. Cliquez sur le dé pour commencer !</p>
     }
   </section>
 
-  <!-- Bouton Flottant "Dé" (inchangé) -->
-  <button type="button" class="fab-button dice-fab" (click)="openGenerateGroupsModal()" title="Générer/Assigner des groupes pour ce brief">
+  <!-- BOUTON FLOTTANT "DÉ" pour la génération -->
+  <button type="button" class="fab-button dice-fab" (click)="openGenerateGroupsModal()" title="Générer des sous-groupes de travail">
     <img src="assets/dés.png" alt="Générer groupes">
   </button>
 
-  <!-- MODALE POUR VOIR LES MEMBRES D'UN GROUPE -->
-  @if (isMembersModalOpen && selectedGroupForMembers) {
-    <div class="modal-overlay members-modal-overlay" (click)="closeMembersModal()">
-      <div class="modal-content members-modal-content" (click)="$event.stopPropagation()">
-        <button class="modal-close-button" (click)="closeMembersModal()" aria-label="Fermer">×</button>
+
+  <!-- MODALE DE GÉNÉRATION DE SOUS-GROUPES (AVEC LE "DÉ") -->
+  @if (isGenerateGroupsModalOpen && brief && sourceGroupForBrief) {
+    <div class="modal-overlay full-screen-modal-overlay" (click)="closeGenerateGroupsModal()">
+      <div class="modal-content large-modal-content generate-groups-modal" (click)="$event.stopPropagation()">
+        <button class="modal-close-button" (click)="closeGenerateGroupsModal()" aria-label="Fermer">×</button>
         <div class="modal-header">
-          <h2>Membres du groupe : {{ selectedGroupForMembers.name }}</h2>
+          <h2>Générer des Sous-Groupes pour "{{ brief.name }}"</h2>
+          <p>À partir de la promo : <strong>{{ sourceGroupForBrief.name }}</strong> ({{sourceGroupForBrief.members.length}} personnes)</p>
         </div>
-        <div class="modal-body members-list-body">
-          @if (selectedGroupForMembers.members && selectedGroupForMembers.members.length > 0) {
+        <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()">
+          <div class="form-group">
+            <label for="gen-people-per-group">Nombre de personnes par sous-groupe :</label>
+            <input type="number" id="gen-people-per-group" name="genPeoplePerGroup"
+                   [(ngModel)]="generationCriteria.peoplePerGroup" min="1" [max]="sourceGroupForBrief.members.length" required>
+          </div>
+          <h4 class="criteria-title">Critères de Mixité :</h4>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-dwwm" name="critereDwwm" [(ngModel)]="generationCriteria.mixAncienDWWM">
+            <label for="critere-dwwm">Mixer les anciens DWWM</label>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-genre" name="critereGenre" [(ngModel)]="generationCriteria.mixGenre">
+            <label for="critere-genre">Mixer les genres</label>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-francais" name="critereFrancais" [(ngModel)]="generationCriteria.mixAisanceFrancais">
+            <label for="critere-francais">Mixer par aisance en Français</label>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-tech" name="critereTech" [(ngModel)]="generationCriteria.mixNiveauTechnique">
+            <label for="critere-tech">Mixer par niveau technique</label>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-profil" name="critereProfil" [(ngModel)]="generationCriteria.mixProfil">
+            <label for="critere-profil">Mixer les profils</label>
+          </div>
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="critere-age" name="critereAge" [(ngModel)]="generationCriteria.mixAge">
+            <label for="critere-age">Mixer les âges</label>
+          </div>
+          @if (generationError) { <p class="error-message">{{ generationError }}</p> }
+          <div class="buttons modal-buttons">
+            <button type="button" class="button-secondary" (click)="closeGenerateGroupsModal()">Annuler</button>
+            <button type="submit" class="button-primary">Générer les Sous-Groupes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  } <!-- Fin modale génération de groupes -->
+
+
+  <!-- NOUVEAU (ou réactivé): MODALE POUR AFFICHER LES MEMBRES D'UN SOUS-GROUPE DE TRAVAIL -->
+  @if (isMembersModalOpen && selectedWorkGroupForMembers) {
+    <div class="modal-overlay members-modal-overlay" (click)="closeWorkGroupMembersModal()"> <!-- Classe overlay spécifique si besoin -->
+      <div class="modal-content members-modal-content" (click)="$event.stopPropagation()"> <!-- Classe contenu spécifique -->
+        <button class="modal-close-button" (click)="closeWorkGroupMembersModal()" aria-label="Fermer">×</button>
+        <div class="modal-header">
+          <h2>Membres du sous-groupe : {{ selectedWorkGroupForMembers.name }}</h2>
+        </div>
+        <div class="modal-body members-list-body"> <!-- Classe body spécifique -->
+          @if (selectedWorkGroupForMembers.members && selectedWorkGroupForMembers.members.length > 0) {
             <ul class="members-ul">
-              @for (member of selectedGroupForMembers.members; track member.id) {
+              @for (member of selectedWorkGroupForMembers.members; track member.id) {
                 <li class="member-item">
                   <span class="member-name">{{ member.nom }}</span>
                   <div class="member-details">
@@ -67,88 +146,101 @@
               }
             </ul>
           } @else {
-            <p>Aucun membre dans ce groupe.</p>
+            <p>Aucun membre dans ce sous-groupe.</p>
           }
         </div>
-        <div class="modal-footer buttons">
-          <button type="button" class="button-secondary" (click)="closeMembersModal()">Fermer</button>
+        <div class="modal-footer buttons"> <!-- Réutiliser la classe .buttons si stylée globalement -->
+          <button type="button" class="button-secondary" (click)="closeWorkGroupMembersModal()">Fermer</button>
         </div>
       </div>
     </div>
-  }
+  } <!-- Fin modale affichage membres -->
 
-  <!-- MODALE DE GÉNÉRATION DE GROUPES (inchangée pour l'instant, sauf le contenu du formulaire) -->
- <!-- MODALE DE GÉNÉRATION DE GROUPES -->
-@if (isGenerateGroupsModalOpen && brief) {
-  <div class="modal-overlay full-screen-modal-overlay" (click)="closeGenerateGroupsModal()">
-    <div class="modal-content large-modal-content generate-groups-modal" (click)="$event.stopPropagation()">
-      <button class="modal-close-button" (click)="closeGenerateGroupsModal()" aria-label="Fermer">×</button>
-      <div class="modal-header">
-        <h2>Générer des Groupes pour "{{ brief.name }}"</h2>
-        @if(brief.peopleListId) { <p>À partir de la promo : <strong>{{ brief.peopleListId }}</strong></p> }
+
+  <!-- MODALE DE MODIFICATION D'UN SOUS-GROUPE DE TRAVAIL -->
+  @if (isEditWorkGroupModalOpen && selectedWorkGroupToEdit && editableWorkGroupData && sourceGroupForBrief) {
+    <div class="modal-overlay" (click)="closeEditWorkGroupModal()"> <!-- Tu peux utiliser une classe overlay spécifique si besoin -->
+      <div class="modal-content large-modal-content" (click)="$event.stopPropagation()"> <!-- Tu peux utiliser une classe contenu spécifique si besoin -->
+        <button class="modal-close-button" (click)="closeEditWorkGroupModal()" aria-label="Fermer">×</button>
+        <div class="modal-header">
+          <h2>Modifier le Sous-Groupe : {{ editableWorkGroupData.name }}</h2>
+        </div>
+        <form class="modal-form" (ngSubmit)="onSaveWorkGroupChanges()">
+          <div class="form-group">
+            <label for="edit-group-name">Nom du Sous-Groupe :</label>
+            <input type="text" id="edit-group-name" name="editGroupName" required [(ngModel)]="editableWorkGroupData.name">
+          </div>
+          
+
+          <h4>Membres Actuels :</h4>
+          @if (editableWorkGroupData.members.length > 0) {
+            <ul class="current-members-in-modal-list">
+              @for (member of editableWorkGroupData.members; track member.id) {
+                <li>
+                  <span>{{ member.nom }} <em>({{ member.profil || 'N/A' }}, N.Tech: {{member.niveauTechnique || 'N/A'}})</em></span>
+                  <button type="button" class="remove-member-button" (click)="removeMemberFromEditableGroup(member)" title="Retirer {{member.nom}}">×</button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p>Ce sous-groupe n'a actuellement aucun membre.</p>
+          }
+
+          <hr class="form-divider">
+
+          <div class="add-person-input-section">
+            <h5>Ajouter une personne de la promo "{{ sourceGroupForBrief.name }}" par nom ou email :</h5>
+            <div class="form-group inline-form-group">
+              <input type="text" id="add-person-input" name="addPersonInput"
+                     placeholder="Nom ou email de la personne"
+                     [(ngModel)]="newPersonInput"
+                     (keyup.enter)="addPersonFromInput()">
+              <button type="button" class="button-add-person" (click)="addPersonFromInput()">Ajouter</button>
+            </div>
+          </div>
+
+          <h5>Ou ajouter depuis la liste des personnes disponibles de la promo :</h5>
+          <div class="available-people-for-edit-list">
+            @for (person of getAvailablePeopleForEditingGroup(); track person.id) {
+              <div class="person-item-to-add" (click)="addPersonToEditableGroup(person)" title="Ajouter {{person.nom}}">
+                + {{ person.nom }} (Profil: {{person.profil || 'N/A'}}, N.Tech: {{person.niveauTechnique || 'N/A'}})
+              </div>
+            } @empty {
+              <p>Toutes les personnes de la promo sont déjà dans ce sous-groupe.</p>
+            }
+          </div>
+
+          @if (editWorkGroupError) { <p class="error-message">{{ editWorkGroupError }}</p> }
+
+          <div class="buttons modal-buttons">
+            <button type="button" class="button-secondary" (click)="closeEditWorkGroupModal()">Annuler</button>
+            <button type="submit" class="button-primary">Enregistrer Modifications</button>
+          </div>
+        </form>
       </div>
-
-      <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()">
-        <div class="form-group">
-          <label for="gen-num-groups">Nombre de personnes par groupe :</label>
-          <input type="number" id="gen-num-groups" name="genNumGroups"
-                 [(ngModel)]="generationFormData.numberOfGroups" min="1" required>
-        </div>
-
-        <div class="form-group">
-          <label for="gen-group-base-name">Nom de base pour les groupes (sera suivi de 1, 2...) :</label>
-          <input type="text" id="gen-group-base-name" name="genGroupBaseName"
-                 [(ngModel)]="generationFormData.groupBaseName" placeholder="Ex: Équipe Alpha" required>
-        </div>
-
-        <h4 class="criteria-title">Critères de Mixité (Cahier des Charges)</h4>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-dwwm" name="critereDwwm"
-                 [(ngModel)]="generationFormData.mixAncienDWWM">
-          <label for="critere-dwwm">Mixer les anciens DWWM</label>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-genre" name="critereGenre"
-                 [(ngModel)]="generationFormData.mixGenre">
-          <label for="critere-genre">Mixer les genres</label>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-francais" name="critereFrancais"
-                 [(ngModel)]="generationFormData.mixAisanceFrancais">
-          <label for="critere-francais">Mixer par aisance en Français</label>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-tech" name="critereTech"
-                 [(ngModel)]="generationFormData.mixNiveauTechnique">
-          <label for="critere-tech">Mixer par niveau technique</label>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-profil" name="critereProfil"
-                 [(ngModel)]="generationFormData.mixProfil">
-          <label for="critere-profil">Mixer les profils (timide, réservé, à l'aise)</label>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <input type="checkbox" id="critere-age" name="critereAge"
-                 [(ngModel)]="generationFormData.mixAge">
-          <label for="critere-age">Mixer les âges</label>
-        </div>
-
-        <!-- Tu pourrais ajouter un input pour le nombre de personnes par groupe si le CdC le sous-entendait -->
-
-        <div class="buttons modal-buttons">
-          <button type="button" class="button-secondary" (click)="closeGenerateGroupsModal()">Annuler</button>
-          <button type="submit" class="button-primary">Lancer la Génération</button>
-        </div>
-      </form>
     </div>
-  </div>
-}
+  } <!-- Fin modale modification sous-groupe -->
+
+
+  <!-- MODALE DE CONFIRMATION DE SUPPRESSION D'UN SOUS-GROUPE DE TRAVAIL -->
+  @if (isDeleteWorkGroupConfirmModalOpen && workGroupToDelete) {
+    <div class="modal-overlay confirm-delete-modal-overlay" (click)="closeDeleteWorkGroupConfirmModal()">
+      <div class="modal-content confirm-delete-modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close-button" (click)="closeDeleteWorkGroupConfirmModal()" aria-label="Fermer">×</button>
+        <div class="modal-header">
+          <h2>Confirmer la Suppression</h2>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir supprimer le sous-groupe "<strong>{{ workGroupToDelete.name }}</strong>" ?</p>
+          <p class="warning-text">Cette action est irréversible.</p>
+        </div>
+        <div class="modal-footer buttons confirm-delete-buttons">
+          <button type="button" class="button-secondary" (click)="closeDeleteWorkGroupConfirmModal()">Annuler</button>
+          <button type="button" class="button-danger" (click)="confirmDeleteWorkGroup()">Oui, Supprimer</button>
+        </div>
+      </div>
+    </div>
+  } <!-- Fin modale suppression sous-groupe -->
 
 } @else {
   <p class="loading-message">Chargement des détails du brief...</p>

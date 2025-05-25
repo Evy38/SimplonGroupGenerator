@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { Brief } from '../../../core/services/models/brief.model'; // Ajuste le chemin
 import { Group } from '../../../core/services/models/group.model'; // Pour la sélection de groupe
 // Tu auras besoin d'un service pour charger les groupes existants
-// import { GroupService } from '../../../core/services/group.service'; // Exemple
+import { PromoService } from '../../../core/services/promo.service'; 
 
 @Component({
   selector: 'app-brief-list',
@@ -42,7 +42,7 @@ export class BriefListComponent implements OnInit {
 
   constructor(
     // private groupService: GroupService // Exemple: injecter un service pour les groupes
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadBriefs();
@@ -52,9 +52,31 @@ export class BriefListComponent implements OnInit {
   loadBriefs(): void {
     // Données simulées (plus tard, viendra d'un service)
     this.briefs = [
-      { id: 'brf1', name: 'Projet Portfolio V1', description: 'Création d\'un portfolio personnel interactif.', imageUrl: 'assets/portfolio.png', assignedGroupId: 'grp2' },
-      { id: 'brf2', name: 'Application de Gestion de Tâches', description: 'Développer une To-Do List complète.', imageUrl: 'assets/taches.png' /* pas de groupe assigné */ },
-      { id: 'brf3', name: 'Clone de Twitter (Simplifié)', description: 'Reproduire les fonctionnalités de base de Twitter.',imageUrl: 'assets/twitter.png', assignedGroupId: 'grp1' },
+      {
+        id: 'brf1',
+        name: 'Projet Portfolio V1',
+        description: 'Création d\'un portfolio pour présenter les projets...', // Votre description
+        imageUrl: 'assets/portfolio.png', // Assurez-vous que ce chemin est correct ou gérez-le
+        assignedGroupId: 'grp2',
+        sourceGroupId: 'idGroupeSourcePourBrf1' // <--- AJOUTEZ CECI (avec une valeur appropriée)
+      },
+      {
+        id: 'brf2',
+        name: 'Application de Gestion de Tâches',
+        description: 'Développement d\'une application web pour la gestion...', // Votre description
+        imageUrl: 'assets/taches.png', // Assurez-vous que ce chemin est correct ou gérez-le
+        // assignedGroupId: 'valeurSiApplicable', // S'il y en a un
+        sourceGroupId: 'idGroupeSourcePourBrf2' // <--- AJOUTEZ CECI (avec une valeur appropriée)
+      },
+      {
+        id: 'brf3',
+        name: 'Clone de Twitter (Simplifié)',
+        description: 'Reproduction des fonctionnalités principales de la plateforme...', // Votre description
+        imageUrl: 'assets/twitter.png', // Assurez-vous que ce chemin est correct ou gérez-le
+        assignedGroupId: 'grp1',
+        sourceGroupId: 'idGroupeSourcePourBrf3' // <--- AJOUTEZ CECI (avec une valeur appropriée)
+      },
+      // ... autres briefs
     ];
   }
 
@@ -133,7 +155,8 @@ export class BriefListComponent implements OnInit {
         name: this.currentBriefData.name,
         description: this.currentBriefData.description,
         imageUrl: this.currentBriefData.imageUrl || undefined,
-        assignedGroupId: this.currentBriefData.assignedGroupId
+        assignedGroupId: this.currentBriefData.assignedGroupId,
+        sourceGroupId: this.currentBriefData.assignedGroupId ?? '' // Ajout d'une valeur pour sourceGroupId (jamais null)
       };
       this.briefs.push(newBrief);
       this.formSuccess = `Brief '${newBrief.name}' créé !`;
@@ -160,7 +183,7 @@ export class BriefListComponent implements OnInit {
     return group ? group.name : 'Groupe inconnu';
   }
 
-   // Méthode pour ouvrir la modale (appelée depuis l'icône poubelle sur une carte de brief)
+  // Méthode pour ouvrir la modale (appelée depuis l'icône poubelle sur une carte de brief)
   openConfirmDeleteModal(briefASupprimer: Brief, event: MouseEvent): void {
     event.stopPropagation();
     this.briefToDelete = briefASupprimer;

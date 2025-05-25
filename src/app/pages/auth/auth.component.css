@@ -1,5 +1,7 @@
 /* auth.component.css */
-
+body{
+   background-image: url("../../../assets/BGSimplon.png");
+}
 /* --- Styles de base (Mobile First) pour la PAGE DE CONNEXION --- */
 .connexion {
     display: flex;

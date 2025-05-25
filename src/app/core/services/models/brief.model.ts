@@ -1,10 +1,10 @@
-// src/app/core/models/brief.model.ts
+// Dans src/app/core/services/models/brief.model.ts
 export interface Brief {
-  id: string | number;
-  name: string;
-  description: string;
-  imageUrl?: string;
-  peopleListId?: string | number; // ID de la "promo" ou liste de personnes source
-  assignedGroupId?: string | number | null; // Si un seul groupe peut être assigné
-  assignedGroupIds?: (string | number)[]; // Si plusieurs groupes peuvent être assignés (préférable)
+    id: string;
+    name: string;
+    description: string;
+    imageUrl?: string;
+    sourceGroupId: string | number; // Celle-ci existe déjà et est requise
+    assignedGroupId?: string | number | null; // Ajoutez celle-ci, rendez-la optionnelle si elle peut être absente au début
+    // ... autres propriétés
 }

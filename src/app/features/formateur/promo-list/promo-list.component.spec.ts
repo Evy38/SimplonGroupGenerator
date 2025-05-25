@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GroupListComponent } from './group-list.component';
+import { GroupListComponent } from './promo-list.component';
 
 describe('GroupListComponent', () => {
   let component: GroupListComponent;

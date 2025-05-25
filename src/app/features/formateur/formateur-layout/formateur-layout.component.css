@@ -46,6 +46,7 @@
   padding-top: 70px; /* Espace pour le bouton burger fixe en haut */
   background-color: #f4f7f6;
   overflow-y: auto;
+  background-image: url("../../../../assets/BGSimplon.png");
   /* Pas de transition sur margin-left ici car la sidebar est 'fixed' sur mobile */
 }
 

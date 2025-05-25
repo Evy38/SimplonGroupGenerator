@@ -8,7 +8,7 @@
    <div class="brief-card" [routerLink]="['/formateur/briefs', brief.id]">
     <div class="brief-card-main-content"> <!-- Ce wrapper est clé -->
         <div class="brief-card-image">
-            <img [src]="brief.imageUrl || 'https://via.placeholder.com/100x100/607D8B/FFFFFF?Text=Img'" [alt]="'Image pour ' + brief.name">
+            <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.name">
         </div>
         <div class="brief-card-content">
             <h3 class="brief-name">{{ brief.name }}</h3>

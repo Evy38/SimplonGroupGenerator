@@ -1,4 +1,6 @@
 /* src/app/features/formateur/brief-detail/brief-detail.component.css */
+
+/* Styles existants pour la page (non modifiés) */
 .brief-detail-header {
   margin-bottom: 30px;
   padding-bottom: 20px;
@@ -32,204 +34,496 @@
   line-height: 1.7;
   color: #555;
   margin-bottom: 15px;
-  white-space: pre-wrap; /* Respecte les sauts de ligne de la description */
+  white-space: pre-wrap;
 }
 .brief-promo-info {
   font-size: 0.95em;
   color: #777;
   margin-top: 10px;
 }
-
-.associated-groups-section {
+.generated-work-groups-section {
   margin-top: 40px;
 }
-.associated-groups-section h2 {
-  font-size: 1.5em;
+.generated-work-groups-section h2 {
+  font-size: 1.6em;
   color: #333;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
-
-/* Styles pour les cartes de groupe sur cette page (peuvent être plus compactes) */
-.group-cards-container.compact-cards {
+.work-group-list-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Cartes un peu plus petites */
+  grid-template-columns: 1fr;
   gap: 20px;
-  margin-bottom: 80px; /* Pour le FAB */
+  margin-bottom: 80px;
 }
-
-.group-card.compact-card {
+.work-group-card {
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
-  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.60); 
+  padding: 0;
   display: flex;
-  flex-direction: column; /* Image en haut, contenu en bas */
+  flex-direction: column;
+  /* gap: 10px; // Géré par padding interne et margin des enfants */
+  cursor: pointer; /* Pour indiquer la cliquabilité de la carte */
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  
 }
-.group-card.compact-card:hover {
+.work-group-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.12);
 }
-
-.group-card-image.compact-image img {
-  width: 100%;
-  height: 130px; /* Hauteur d'image pour les cartes compactes */
-  object-fit: cover;
+.work-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 15px;
 }
-
-.group-card-content.compact-content {
-  padding: 15px;
-  text-align: center; /* Centrer le contenu de la petite carte */
-}
-.group-card-content.compact-content .group-name {
-  font-size: 1.05em;
+.work-group-name {
+  font-size: 1.1em;
   font-weight: 600;
-  margin-bottom: 5px;
+  color: #2c3e50;
+  margin: 0;
 }
-.group-card-content.compact-content .group-members-count {
-  font-size: 0.85em;
+.work-group-actions {
+  display: flex;
+  gap: 8px; /* Espace entre les boutons d'action */
+}
+.work-group-actions .icon-button { /* Styles généraux des icon-button ici */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.work-group-actions .icon-button img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.work-group-actions .icon-button:hover {
+  background-color: #f0f0f0;
+}
+
+.work-group-members-list {
+  list-style: none;
+  padding: 0 15px 15px 15px;
+  margin: 0;
+  font-size: 0.9em;
+  color: #555;
+  flex-grow: 1; /* Pour que la carte prenne toute la hauteur si les autres le font */
+}
+.work-group-members-list .member-name-item {
+  padding: 4px 0;
+}
+.work-group-members-list .member-name-item.more-members {
+  font-style: italic;
+  color: #777;
+}
+.work-group-members-list .member-name-item:not(:last-child) {
+   border-bottom: 1px dashed #f5f5f5;
+}
+.no-members-in-card {
+  padding: 0 15px 15px 15px;
+  font-size: 0.9em;
   color: #7f8c8d;
+  font-style: italic;
 }
-/* .view-group-link { ... } */
-
-
-.empty-list-message, .loading-message {
+.empty-list-message {
+  grid-column: 1 / -1;
   padding: 30px;
   text-align: center;
   color: #777;
   font-style: italic;
 }
-
-/* Bouton Flottant "Dé" */
-.fab-button.dice-fab {
+.fab-button.dice-fab { /* Styles pour le FAB spécifique avec l'icône de dé */
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;  /* Taille du cercle du bouton */
-  height: 60px; /* Taille du cercle du bouton */
+  bottom: 20px; /* Moins de marge sur mobile */
+  right: 20px;
+  width: 56px;
+  height: 56px;
   border: none;
   cursor: pointer;
-  z-index: 950;
-  display: flex; /* Pour centrer l'image à l'intérieur */
-  align-items: center;
-  justify-content: center;
-  padding: 0; /* Enlève le padding par défaut du bouton si l'image prend toute la place */
-  transition: transform 0.1s ease-out; /* Transition plus douce pour la rotation */
-  background-color: transparent;
-}
-
-.fab-button.dice-fab img {
-  width: 70px;  /* Taille de ton image de dé à l'intérieur du bouton */
-  height: 70px; /* Taille de ton image de dé à l'intérieur du bouton */
-  display: block; /* Pour éviter tout espace supplémentaire sous l'image */
-}
-
-.fab-button.dice-fab:hover {
-  transform: scale(1.1) rotate(45deg); /* Agrandissement léger et rotation au survol */
-}
-
-.fab-button.dice-fab:active { /* Effet au clic */
-  transform: scale(1.0) rotate(15deg); /* Légère réduction et rotation pour l'effet "pressé" */
-}
-
-/* Styles pour la modale de génération de groupes */
-/* Tu peux réutiliser .full-screen-modal-overlay, .large-modal-content, .modal-header, etc.
-   que tu as définis pour les autres modales, ou créer des classes spécifiques.
-   Assure-toi que le z-index de la modale est supérieur à celui du FAB. */
-.generate-groups-modal .modal-header p {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
-}
-
-
-/* --- STYLES POUR LA MODALE DES MEMBRES D'UN GROUPE --- */
-.members-modal-overlay { /* Peut réutiliser .modal-overlay si le style est identique */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 900; /* Z-index cohérent */
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1060; /* Au-dessus du FAB, potentiellement en dessous de la modale de génération si elle peut s'ouvrir par-dessus */
-  padding: 20px;
-  box-sizing: border-box;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease-out;
+}
+.fab-button.dice-fab img {
+  width: 50px; /* Taille de l'icône dans le FAB */
+  height: 50px;
+  display: block;
+}
+.fab-button.dice-fab:hover {
+  transform: scale(1.05) rotate(180deg); /* Légère rotation au survol */
+}
+.fab-button.dice-fab:active {
+  transform: scale(0.95) rotate(0deg); /* Effet de clic */
 }
 
-.members-modal-content { /* Peut réutiliser .modal-content si le style est identique */
+
+/* === STYLES COMMUNS AUX MODALES (MOBILE FIRST) === */
+/* Ces classes sont utilisées par toutes les modales dans brief-detail.component.html */
+
+.modal-overlay,
+.full-screen-modal-overlay, /* Traité comme .modal-overlay car fonctionnellement similaire */
+.members-modal-overlay,     /* Traité comme .modal-overlay */
+.confirm-delete-modal-overlay { /* Traité comme .modal-overlay */
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex; justify-content: center; align-items: center;
+  padding: 15px;
+  z-index: 1050;
+}
+
+.modal-content { /* Style de base pour .modal-content */
   background-color: #ffffff;
-  padding: 25px 30px;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   width: 100%;
-  max-width: 550px; /* Taille pour la liste des membres */
-  max-height: 85vh;
+  max-height: 90vh; /* Limite la hauteur et active le scroll si besoin */
   overflow-y: auto;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  padding: 20px;
 }
 
-/* .members-modal-content .modal-close-button { ... réutiliser ou styler ... } */
-/* .members-modal-content .modal-header { ... réutiliser ou styler ... } */
-/* .members-modal-content .modal-footer { ... réutiliser ou styler ... } */
-
-
-.members-list-body {
-  padding: 10px 0;
-  flex-grow: 1; /* Pour que la liste prenne l'espace si la modale a une hauteur fixe */
+.modal-close-button {
+  position: absolute; top: 10px; right: 10px;
+  background: none; border: none; font-size: 24px;
+  color: #aaa; cursor: pointer; line-height: 1; padding: 5px;
 }
+.modal-close-button:hover { color: #555; }
 
-.members-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.member-item {
-  padding: 12px 0;
+.modal-header {
+  text-align: center; margin-bottom: 20px; padding-bottom: 10px;
   border-bottom: 1px solid #f0f0f0;
 }
-.member-item:last-child {
-  border-bottom: none;
+.modal-header h2 {
+  font-size: 20px;
+  color: #333; margin: 0 0 5px 0;
+}
+.modal-header p {
+  font-size: 14px; color: #666; margin: 0;
 }
 
-.member-name {
+.modal-form .form-group { margin-bottom: 15px; }
+.modal-form label { display: block; font-weight: 500; margin-bottom: 6px; font-size: 14px; }
+.modal-form input[type="number"],
+.modal-form input[type="text"],
+.modal-form input[type="url"],
+.modal-form select {
+  width: 100%; padding: 10px 12px; border: 1px solid #ccc;
+  border-radius: 6px; font-size: 15px;
+  box-sizing: border-box; /* Important pour que padding ne change pas la largeur totale */
+}
+/* Spécifique pour les groupes de checkbox */
+.modal-form .form-group.checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Moins de marge pour les checkboxes groupées */
+}
+.modal-form .form-group.checkbox-group input[type="checkbox"] {
+  width: auto; /* Ne pas prendre toute la largeur */
+  margin-right: 8px;
+  margin-top: 0; /* Ajustement vertical si nécessaire */
+}
+.modal-form .form-group.checkbox-group label {
+  margin-bottom: 0; /* La marge est sur .form-group */
+  font-weight: normal; /* Moins d'emphase pour les labels de checkbox */
+}
+
+
+.modal-buttons,
+.modal-footer.buttons { /* .buttons est utilisé dans les deux contextes */
+  display: flex; justify-content: flex-end; gap: 10px;
+  margin-top: 25px;
+  padding-top: 15px; /* Ajout d'un padding-top pour séparer des derniers éléments du form/body */
+  border-top: 1px solid #f0f0f0; /* Ligne de séparation avant les boutons */
+}
+
+/* Style des boutons communs */
+.button-primary, .button-secondary, .button-danger, .button-add-person {
+  padding: 10px 20px; font-size: 15px; border-radius: 6px;
+  font-weight: 500; cursor: pointer; border: none;
+  transition: background-color 0.2s ease;
+}
+.button-primary { background-color: #14343c; color: white; }
+.button-primary:hover { background-color: #0d2329; }
+.button-secondary { background-color: #f0f0f0; color: #555; border:1px solid #ddd; }
+.button-secondary:hover { background-color: #e0e0e0; }
+.button-danger { background-color: #ca1c42; color: white; } /* margin-left retiré, utiliser gap sur .modal-buttons */
+.button-danger:hover { background-color: #a51735; }
+
+.modal-form .error-message {
+  color: #c0392b;
+  background-color: #fdecea;
+  border: 1px solid #e74c3c60;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  margin-top: 15px;
+  text-align: left;
+}
+
+
+/* --- STYLES SPÉCIFIQUES AUX DIFFÉRENTES MODALES --- */
+
+/* 1. Modale de GÉNÉRATION DE GROUPES (.generate-groups-modal) */
+/* Utilise .large-modal-content (héritera des styles de base et des styles de .large-modal-content définis plus bas) */
+.generate-groups-modal .criteria-title { /* Titre H4 pour les critères */
+  font-size: 1em; /* basé sur .form-section h4 de l'exemple */
   font-weight: 600;
-  color: #2c3e50;
-  display: block; /* Pour qu'il prenne sa ligne */
-  margin-bottom: 5px;
-  font-size: 1.05em;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
 }
 
-.member-details {
-  font-size: 0.9em;
+
+/* 2. Modale d'AFFICHAGE DES MEMBRES D'UN SOUS-GROUPE (.members-modal-content) */
+.members-modal-content { /* Hérite de .modal-content */
+  max-width: 480px; /* Largeur mobile de l'exemple */
+}
+.members-modal-content .modal-body.members-list-body { /* Div spécifique pour le corps de la liste */
+  max-height: 60vh; /* Ajuster au besoin */
+  overflow-y: auto;
+  padding: 0 5px; /* Léger padding interne si besoin */
+}
+.members-modal-content .members-ul { /* Remplace .members-list ul de l'exemple */
+  list-style:none; padding:0; margin:0;
+}
+.members-modal-content .member-item { /* Remplace .members-list li */
+  padding:10px 5px; border-bottom:1px solid #f0f0f0; font-size:15px;
+}
+.members-modal-content .member-item:last-child { border-bottom:none; }
+
+.members-modal-content .member-name { /* Style du nom du membre */
+  font-weight:500; color:#333; display: block; margin-bottom: 4px;
+}
+.members-modal-content .member-details { /* Conteneur pour les détails */
+  font-size:0.85em; color:#666;
+}
+.members-modal-content .member-detail { /* Style pour chaque détail individuel */
+  display: block; /* Chaque détail sur sa propre ligne sous le nom */
+  margin-left: 10px; /* Petite indentation */
+  margin-bottom: 2px;
+}
+.members-modal-content .member-detail:before { /* Puce pour chaque détail */
+  content: "• ";
+  margin-right: 4px;
+}
+
+
+/* 3. Modale de MODIFICATION D'UN SOUS-GROUPE (utilise .large-modal-content) */
+/* Elle utilise .large-modal-content, donc hérite de sa largeur. */
+/* Styles pour les éléments spécifiques à cette modale, basés sur l'exemple de create/edit group */
+
+.large-modal-content .modal-form h4 { /* Pour "Membres Actuels :" */
+  font-size: 1em; font-weight: 600; margin-bottom: 10px;
+  margin-top: 20px; /* Espace avant cette section */
+}
+.large-modal-content .current-members-in-modal-list {
+  list-style:none; padding:0; margin-bottom:15px;
+  max-height: 150px; overflow-y: auto;
+  border: 1px solid #eee; padding: 5px; border-radius: 4px;
+}
+.large-modal-content .current-members-in-modal-list li {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:6px 8px; background-color:#f9f9f9; border-bottom:1px solid #eee;
+  border-radius:4px; margin-bottom:5px; font-size:0.9em;
+}
+.large-modal-content .current-members-in-modal-list li:last-child { border-bottom: none; }
+.large-modal-content .current-members-in-modal-list em {
+  font-size: 0.9em; color: #777;
+}
+
+.large-modal-content .remove-member-button { /* Équivalent de .remove-person-btn */
+  background:none; border:none; color:#e74c3c; font-size:1.2em;
+  cursor:pointer; padding:2px 5px; line-height:1; border-radius: 3px;
+}
+.large-modal-content .remove-member-button:hover { color:#c0392b; background-color: #fdecea; }
+
+.modal-form .form-divider { /* Tiré de l'exemple */
+  border:none; border-top:1px dashed #ccc; margin:20px 0;
+}
+
+.large-modal-content .add-person-input-section h5, /* Pour les titres h5 dans cette modale */
+.large-modal-content .modal-form > h5 { /* Si h5 est direct enfant de modal-form */
+  font-size: 0.9em; font-weight: 500; margin-top: 20px; margin-bottom: 10px;
+}
+.large-modal-content .inline-form-group { /* Pour le champ d'ajout et son bouton */
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Aligne verticalement l'input et le bouton */
+}
+.large-modal-content .inline-form-group input[type="text"] {
+  flex-grow: 1; /* L'input prend l'espace restant */
+}
+.button-add-person { /* Style spécifique pour le bouton "Ajouter" à côté de l'input */
+  padding: 10px 15px; /* Doit correspondre à la hauteur de l'input */
+  font-size: 14px;
+  background-color: #14343c; /* Vert pour "ajouter" */
+  color: white;
+  flex-shrink: 0; /* Empêche le bouton de rétrécir */
+}
+.button-add-person:hover { background-color: #4cae4c; }
+
+.large-modal-content .available-people-for-edit-list { /* Similaire à .available-people-list */
+  max-height: 150px; overflow-y: auto; border: 1px solid #eee;
+  padding: 5px; border-radius: 4px; margin-bottom: 20px;
+}
+.large-modal-content .person-item-to-add { /* Similaire à .person-item */
+  padding:8px 10px; cursor:pointer; border-radius:4px; margin-bottom:4px;
+  border:1px solid transparent; transition: background-color 0.2s ease, border-color 0.2s ease;
+  font-size:0.9em;
+}
+.large-modal-content .person-item-to-add:hover { background-color:#f0f8ff; border-color: #cce4ff; }
+
+
+/* 4. Modale de CONFIRMATION DE SUPPRESSION (.confirm-delete-modal-content) */
+.confirm-delete-modal-content { /* Hérite de .modal-content */
+  max-width: 400px; /* Plus petite, comme dans l'exemple */
+  text-align:center; padding: 20px 25px;
+}
+.confirm-delete-modal-content .modal-header h2 { color:#c0392b; font-size:18px; } /* Titre rouge */
+.confirm-delete-modal-content .modal-body p { margin-bottom:8px; font-size:15px; }
+.confirm-delete-modal-content .warning-text { /* Style du texte d'avertissement */
+  color:#ca1c42; font-weight:500; margin-top:10px; font-size:0.9em;
+}
+.confirm-delete-modal-content .modal-footer.confirm-delete-buttons { /* Conteneur des boutons de confirmation */
+  justify-content:space-around; /* Sépare les boutons Annuler et Supprimer */
+  border-top: none; /* Pas de bordure pour cette modale spécifique en bas */
+  padding-top: 10px;
+}
+
+
+/* Classe générique pour .large-modal-content (utilisée par Génération et Édition) */
+.large-modal-content { /* Hérite de .modal-content */
+  max-width: 500px; /* Largeur max mobile de l'exemple */
+}
+
+
+/* === MEDIA QUERIES POUR TABLETTES ET PLUS GRANDS ÉCRANS === */
+@media (min-width: 768px) {
+  /* Styles existants pour la page (non modifiés par moi pour cette section) */
+  .work-group-list-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+  }
+  .fab-button.dice-fab {
+    bottom: 30px; right: 30px; width: 60px; height: 60px;
+  }
+  .fab-button.dice-fab img {
+    width: 32px; height: 32px;
+  }
+
+  /* --- Styles communs aux MODALES (grands écrans) --- */
+  .modal-overlay,
+  .full-screen-modal-overlay,
+  .members-modal-overlay,
+  .confirm-delete-modal-overlay {
+    padding: 30px;
+  }
+  .modal-content {
+    padding: 30px 40px; border-radius: 12px;
+  }
+  .modal-close-button { top: 15px; right: 20px; font-size: 28px; }
+  .modal-header { margin-bottom: 30px; padding-bottom: 15px; }
+  .modal-header h2 { font-size: 24px; }
+  .modal-header p { font-size: 15px; }
+  .modal-form .form-group { margin-bottom: 20px; }
+  .modal-form label { font-size: 15px; }
+  .modal-form input[type="number"],
+  .modal-form input[type="text"],
+  .modal-form input[type="url"],
+  .modal-form select { padding: 10px 14px; font-size: 16px; }
+  .modal-buttons,
+  .modal-footer.buttons { gap: 15px; margin-top: 30px; padding-top: 20px; }
+  .button-primary, .button-secondary, .button-danger, .button-add-person {
+    padding: 10px 25px; font-size: 16px;
+  }
+
+  /* --- Styles spécifiques aux modales (grands écrans) --- */
+
+  /* 1. Modale de Génération de Groupes (utilise .large-modal-content) */
+  .large-modal-content { /* S'applique aussi à la modale d'édition de sous-groupe */
+    max-width: 650px;
+  }
+  .generate-groups-modal .criteria-title {
+    font-size: 1.1em; margin-bottom: 15px;
+  }
+  .modal-form .form-group.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+  }
+
+
+  /* 2. Modale d'Affichage des Membres */
+  .members-modal-content {
+    max-width: 550px; padding: 25px 30px;
+  }
+  .members-modal-content .member-item { padding: 12px 5px; font-size: 16px; }
+  .members-modal-content .member-name { margin-bottom: 6px; }
+  .members-modal-content .member-details { font-size: 0.9em; }
+  .members-modal-content .member-detail { margin-left: 15px; }
+
+
+  /* 3. Modale de Modification d'un Sous-Groupe (utilise .large-modal-content, déjà défini) */
+  .large-modal-content .modal-form h4 {
+    font-size: 1.1em; margin-bottom: 15px;
+  }
+  .large-modal-content .current-members-in-modal-list { max-height: 200px; }
+  .large-modal-content .current-members-in-modal-list li { padding: 8px 10px; font-size: 0.95em; }
+
+  .large-modal-content .add-person-input-section h5,
+  .large-modal-content .modal-form > h5 {
+    font-size: 1em; margin-top: 25px; margin-bottom: 12px;
+  }
+  .button-add-person { padding: 10px 20px; font-size: 15px; }
+
+  .large-modal-content .available-people-for-edit-list { max-height: 200px; }
+  .large-modal-content .person-item-to-add { padding: 10px 12px; font-size: 0.95em;}
+
+
+  /* 4. Modale de Confirmation de Suppression */
+  .confirm-delete-modal-content {
+    max-width: 450px; padding: 25px 30px;
+  }
+  .confirm-delete-modal-content .modal-header h2 { font-size: 20px; }
+  .confirm-delete-modal-content .modal-body p { font-size: 16px; }
+  .confirm-delete-modal-content .warning-text { font-size: 0.95em; }
+  .confirm-delete-modal-content .modal-footer.confirm-delete-buttons {
+    margin-top: 25px;
+  }
+}
+
+/*
+  La classe `.blurred` n'est pas présente dans ton HTML de brief-detail.component.html.
+  Si tu l'ajoutes au conteneur principal de ta page (comme dans l'exemple group-list),
+  les styles suivants s'appliqueront :
+*/
+/*
+.blurred {
+  filter: blur(3px);
+  transition: filter 0.3s ease-out;
+}
+@media (min-width: 768px) {
+  .blurred { filter: blur(4px); }
+}
+*/
+
+/* Style pour le message de chargement, s'il est visible */
+.loading-message {
+  text-align: center;
+  font-size: 1.2em;
   color: #555;
-  line-height: 1.5;
-}
-
-.member-detail {
-  display: block; /* Chaque détail sur une nouvelle ligne (ou inline-block avec des marges) */
-  margin-left: 10px; /* Petite indentation pour les détails */
-  font-size: 0.9em;
-  color: #666;
-}
-.member-detail:not(:last-child) {
-  margin-bottom: 3px;
-}
-
-/* --- STYLES POUR LA MODALE DE GÉNÉRATION DE GROUPES (précisions) --- */
-.generate-groups-modal .criteria-title {
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #333;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
+  padding: 40px;
 }

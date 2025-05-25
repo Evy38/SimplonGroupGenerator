@@ -3,7 +3,7 @@ import { AuthComponent } from './pages/auth/auth.component';
 import { authGuard } from './core/guards/auth.guard';
 import { FormateurLayoutComponent } from './features/formateur/formateur-layout/formateur-layout.component';
 import { FormateurDashboardComponent } from './features/formateur/formateur-dashboard/formateur-dashboard.component'; // Peut-être une page d'accueil du formateur
-import { GroupListComponent } from './features/formateur/group-list/group-list.component';
+import { PromoListComponent } from './features/formateur/promo-list/promo-list.component';
 import { BriefListComponent } from './features/formateur/brief-list/brief-list.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { BriefDetailComponent } from '../app/features/formateur/brief-detail/brief-detail.component';
@@ -19,11 +19,11 @@ export const routes: Routes = [
     children: [ // Routes enfants qui s'afficheront dans le <router-outlet> de FormateurLayoutComponent
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Rediriger /formateur vers /formateur/dashboard
       { path: 'dashboard', component: FormateurDashboardComponent }, // Page d'accueil de la section formateur
-      { path: 'groupes', component: GroupListComponent },
+      { path: 'promos', component: PromoListComponent },
       { path: 'briefs', component: BriefListComponent },
-      {path: 'profil', component: ProfileComponent,},
-       { path: 'briefs/:id', component: BriefDetailComponent },
-       
+      { path: 'profil', component: ProfileComponent, },
+      { path: 'briefs/:id', component: BriefDetailComponent },
+
     ]
   },
 
