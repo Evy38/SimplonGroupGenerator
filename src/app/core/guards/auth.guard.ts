@@ -3,23 +3,29 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service'; // Ajuste le chemin
 
 
+// Dans auth.guard.ts
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  console.log('AuthGuard: Vérification pour la route:', state.url); // Log de débogage
+
   if (authService.isLoggedIn()) {
-    // Vérifier le rôle si la route a des données de rôle attendu
-    const expectedRole = route.data?.['expectedRole'];
-    if (expectedRole && !authService.hasRole(expectedRole)) {
-      console.warn(`AuthGuard: Rôle ${expectedRole} attendu, mais l'utilisateur a le rôle ${authService.currentUserValue?.role}. Redirection.`);
-      router.navigate(['/']); // Ou une page "accès refusé"
+    const expectedRole = route.data?.['expectedRole'] as string | undefined; // Soyons explicite sur le type
+    const currentUser = authService.currentUserValue;
+
+    console.log('AuthGuard: Utilisateur connecté.', 'Rôle attendu:', expectedRole, 'Rôle actuel:', currentUser?.role);
+
+    if (expectedRole && (!currentUser || currentUser.role !== expectedRole)) {
+      console.warn(`AuthGuard: Rôle incorrect. Attendu: ${expectedRole}, Actuel: ${currentUser?.role}. Redirection vers /auth.`);
+      router.navigate(['/auth']); // Rediriger vers la page d'authentification
       return false;
     }
-    return true; // L'utilisateur est connecté (et a le bon rôle si spécifié)
+    console.log('AuthGuard: Accès autorisé.');
+    return true;
   }
 
-  // Non connecté, redirection vers la page de connexion
-  console.warn("AuthGuard: Utilisateur non connecté. Redirection vers la page de connexion.");
-  router.navigate(['/']); // Ou state.url pour essayer de rediriger après connexion
+  console.warn("AuthGuard: Utilisateur non connecté. Redirection vers /auth.");
+  router.navigate(['/auth'], { queryParams: { returnUrl: state.url } }); // Optionnel: garder l'URL de retour
   return false;
 };

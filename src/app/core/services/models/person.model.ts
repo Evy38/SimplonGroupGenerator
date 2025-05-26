@@ -1,13 +1,14 @@
-// src/app/core/models/person.model.ts
+import { UserRole } from './user.model';
+
 export interface Person {
-  id: number | string;
+  id: string; 
   nom: string;
-  genre?: 'masculin' | 'feminin' | 'nsp';         // Optionnel
-  aisanceFrancais?: 1 | 2 | 3 | 4;                // Optionnel
-  ancienDWWM?: boolean;                           // Optionnel
-  niveauTechnique?: 1 | 2 | 3 | 4;                // Optionnel
-  profil?: 'timide' | 'reserve' | 'alaise';       // Optionnel
-  age?: number;                                   // Optionnel
-  email?: string;                                 // Déjà optionnel, c'est bien
-  role?: 'apprenant' | 'formateur';               // Optionnel si tu l'ajoutes
+  email?: string; 
+  role?: UserRole; 
+  genre: 'masculin' | 'feminin' | 'nsp' | '';
+  aisanceFrancais: number; // 1-4
+  ancienDWWM: boolean;
+  niveauTechnique: number; // 1-4
+  profil: 'timide' | 'reserve' | 'alaise' | '';
+  age: number | null;
 }

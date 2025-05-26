@@ -1,20 +1,20 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Ajoute CommonModule pour @if, etc.
-import { Router } from '@angular/router'; // <<< IMPORT Router
-import { AuthService } from '../../core/services/auth.service'; // <<< IMPORT AuthService (vérifie bien ce chemin)
-
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms'; // NgForm est optionnel si tu n'utilises pas #formRef="ngForm"
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { Person } from '../../core/services/models/person.model'; // Assure-toi que ce chemin est correct
+// UserRole n'est pas directement utilisé ici car AuthService s'en charge
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [FormsModule, CommonModule ],
+  imports: [FormsModule, CommonModule],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.css' 
+  styleUrls: ['./auth.component.css']
 })
-
-export class AuthComponent {
-// --- Pour le formulaire de CONNEXION  ---
+export class AuthComponent implements OnInit {
+  // --- Pour le formulaire de CONNEXION ---
   loginData = {
     email: '',
     password: ''
@@ -22,73 +22,100 @@ export class AuthComponent {
   loginError: string | null = null;
 
   // --- Pour la MODALE et le formulaire d'INSCRIPTION ---
-  isRegisterModalOpen: boolean = false; // Contrôle l'affichage de la modale
-  registrationStep: 'roleSelection' | 'formApprenant' | 'formFormateur' = 'roleSelection'; // Étapes dans la modale
-
-  // Données communes pour les deux types d'inscription
-  registerBaseData = {
-    email: '',
-    password: ''
-  };
+  isRegisterModalOpen: boolean = false;
+  registrationStep: 'roleSelection' | 'formApprenant' | 'formFormateur' = 'roleSelection';
 
   // Données spécifiques pour l'inscription Apprenant
   registerApprenantData = {
-    ...this.registerBaseData,
-    name: '', // Nom complet
-    genre: '' as 'masculin' | 'feminin' | 'nsp' | '', // nsp = ne se prononce pas, '' = non sélectionné
-    aisanceFrancais: 0, // 1 à 4 (0 si non sélectionné)
+    name: '',
+    email: '',
+    password: '',
+    genre: '' as 'masculin' | 'feminin' | 'nsp' | '', // '' pour l'option "-- Sélectionnez --"
+    aisanceFrancais: 0, // 0 pour l'option "-- Sélectionnez un niveau --"
     ancienDWWM: false,
-    niveauTechnique: 0, // 1 à 4
-    profil: '' as 'timide' | 'reserve' | 'alaise' | '',
-    age: null as number | null // Pour permettre un champ vide initialement
+    niveauTechnique: 0, // 0 pour l'option "-- Sélectionnez un niveau --"
+    profil: '' as 'timide' | 'reserve' | 'alaise' | '', // '' pour l'option "-- Sélectionnez --"
+    age: null as number | null
   };
 
   // Données spécifiques pour l'inscription Formateur
- registerFormateurData = {
-    ...this.registerBaseData,
-    name: '', // Le formateur a aussi un nom
-    organizationName: '',
+  registerFormateurData = {
+    name: '', // Ajout du nom pour le formateur aussi, pour cohérence avec User model
+    email: '',
+    password: '',
+    organizationName: ''
   };
 
   registerError: string | null = null;
   registerSuccess: string | null = null;
 
-constructor(
-  private authService: AuthService,
-  private router: Router
-) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  // --- MÉTHODES POUR LA CONNEXION (restent les mêmes) ---
- onLoginSubmit(): void {
-    console.log('onLoginSubmit a été appelée !'); // PREMIER POINT DE DÉBOGAGE
+ngOnInit(): void {
+  console.log('AuthComponent ngOnInit: Exécution de ngOnInit. URL actuelle:', this.router.url); // Log 1
+
+  if (this.authService.isLoggedIn()) {
+    const currentUserRole = this.authService.currentUserValue?.role;
+    console.log('AuthComponent ngOnInit: Utilisateur déjà connecté. Rôle:', currentUserRole); // Log 2
+
+    // IMPORTANT : Éviter de rediriger si on est déjà sur la bonne page cible ou si la redirection créerait une boucle
+    const currentUrlIsAuth = this.router.url.includes('/auth'); // Ou === '/auth' si pas de sous-routes
+
+    if (currentUserRole === 'formateur' && this.router.url !== '/formateur') { // Vérifie qu'on n'est pas déjà sur /formateur
+      console.log('AuthComponent ngOnInit: Redirection vers /formateur'); // Log 3a
+      this.router.navigate(['/formateur']);
+    } else if (currentUserRole === 'apprenant' && this.router.url !== '/apprenant') { // Vérifie qu'on n'est pas déjà sur /apprenant
+      console.log('AuthComponent ngOnInit: Redirection vers /apprenant'); // Log 3b
+      this.router.navigate(['/apprenant']);
+    } else if (currentUserRole && currentUrlIsAuth) {
+  
+      console.log('AuthComponent ngOnInit: Utilisateur connecté sur /auth avec un rôle non géré pour redirection spécifique, redirection vers / (ou page daccueil par défaut).'); 
+   
+    } else {
+      console.log('AuthComponent ngOnInit: Utilisateur connecté, mais pas de redirection nécessaire depuis cette URL ou rôle non géré pour une redirection spécifique.');
+    }
+  } else {
+    console.log('AuthComponent ngOnInit: Utilisateur non connecté. Affichage de la page AuthComponent.'); // Log 4
+  }
+}
+  // --- MÉTHODES POUR LA CONNEXION ---
+  onLoginSubmit(): void {
+    console.log('AuthComponent: onLoginSubmit appelé avec:', this.loginData);
     this.loginError = null;
-    const success = this.authService.login(this.loginData.email, this.loginData.password);
 
-    console.log('Résultat de authService.login:', success); // DEUXIÈME POINT DE DÉBOGAGE
+    if (!this.loginData.email || !this.loginData.password) {
+        this.loginError = 'L\'email et le mot de passe sont requis.';
+        return;
+    }
+
+    const success = this.authService.login(this.loginData.email, this.loginData.password);
 
     if (success) {
       const currentUser = this.authService.currentUserValue;
-      console.log('Utilisateur connecté:', currentUser); // TROISIÈME POINT DE DÉBOGAGE
-
+      console.log('AuthComponent: Connexion réussie, utilisateur:', currentUser);
       if (currentUser?.role === 'formateur') {
         this.router.navigate(['/formateur']);
       } else if (currentUser?.role === 'apprenant') {
         this.router.navigate(['/apprenant']);
       } else {
+        // Redirection par défaut si rôle non géré ou utilisateur sans rôle (ne devrait pas arriver)
         this.router.navigate(['/']);
       }
     } else {
       this.loginError = 'Email ou mot de passe incorrect.';
-      console.log('Échec de la tentative de connexion.');
+      console.warn('AuthComponent: Échec de la connexion.');
     }
   }
 
   // --- MÉTHODES POUR LA MODALE D'INSCRIPTION ---
   openRegisterModal(): void {
     this.isRegisterModalOpen = true;
-    this.registrationStep = 'roleSelection'; // Toujours commencer par la sélection du rôle
-    this.loginError = null; // Effacer les erreurs du formulaire de connexion
-    this.resetRegisterForm(); // Réinitialiser les formulaires d'inscription
+    this.registrationStep = 'roleSelection';
+    this.loginError = null;
+    this.resetRegisterForms();
   }
 
   closeRegisterModal(): void {
@@ -97,62 +124,116 @@ constructor(
     this.registerSuccess = null;
   }
 
-  // Sélection du rôle dans la modale
   selectRole(role: 'apprenant' | 'formateur'): void {
     if (role === 'apprenant') {
       this.registrationStep = 'formApprenant';
     } else if (role === 'formateur') {
       this.registrationStep = 'formFormateur';
     }
-    this.resetRegisterForm(); // Réinitialiser au cas où on change de rôle
+    this.resetRegisterForms(); // Réinitialiser les champs si on change de rôle
   }
 
-  // Revenir à la sélection du rôle depuis un formulaire d'inscription
   backToRoleSelection(): void {
     this.registrationStep = 'roleSelection';
-    this.resetRegisterForm();
+    this.resetRegisterForms();
   }
 
-  // Soumission du formulaire d'inscription Apprenant
   onRegisterApprenantSubmit(): void {
     this.registerError = null;
     this.registerSuccess = null;
-    console.log('Inscription Apprenant soumise :', this.registerApprenantData);
+    console.log('AuthComponent: onRegisterApprenantSubmit appelé avec:', this.registerApprenantData);
 
-    if (!this.registerApprenantData.name || !this.registerApprenantData.email || !this.registerApprenantData.password) {
-      this.registerError = "Tous les champs sont obligatoires.";
+    // Validation
+    if (
+      !this.registerApprenantData.name || !this.registerApprenantData.email ||
+      !this.registerApprenantData.password || !this.registerApprenantData.genre ||
+      this.registerApprenantData.aisanceFrancais === 0 ||
+      this.registerApprenantData.niveauTechnique === 0 ||
+      !this.registerApprenantData.profil || this.registerApprenantData.age === null ||
+      this.registerApprenantData.age < 1
+    ) {
+      this.registerError = 'Veuillez remplir tous les champs obligatoires correctement.';
+      console.warn('AuthComponent: Validation inscription apprenant échouée.');
       return;
     }
-    // Simulation
-    this.registerSuccess = `Compte Apprenant pour ${this.registerApprenantData.name} créé !`;
-    // Idéalement, fermer la modale ou afficher un message puis fermer
-    // setTimeout(() => this.closeRegisterModal(), 2000);
+
+    const userDataForAuth = {
+      name: this.registerApprenantData.name,
+      email: this.registerApprenantData.email,
+      password: this.registerApprenantData.password,
+    };
+
+    const personDetails: Partial<Person> = {
+      genre: this.registerApprenantData.genre,
+      aisanceFrancais: Number(this.registerApprenantData.aisanceFrancais),
+      ancienDWWM: this.registerApprenantData.ancienDWWM,
+      niveauTechnique: Number(this.registerApprenantData.niveauTechnique),
+      profil: this.registerApprenantData.profil,
+      age: this.registerApprenantData.age !== null ? Number(this.registerApprenantData.age) : null,
+      // nom: this.registerApprenantData.name, // Peut être redondant si User a déjà name
+      // email: this.registerApprenantData.email, // Idem
+      // role: 'apprenant' // Le rôle est déjà passé à registerUser
+    };
+
+    const registrationResult = this.authService.registerUser(userDataForAuth, 'apprenant', personDetails);
+
+    if (registrationResult.success) {
+      this.registerSuccess = `Compte Apprenant pour ${this.registerApprenantData.name} créé avec succès ! Vous pouvez maintenant vous connecter.`;
+      console.log('AuthComponent: Inscription apprenant réussie.', registrationResult);
+       this.resetRegisterForms();
+      // Optionnel: fermer la modale après un délai
+      // setTimeout(() => this.closeRegisterModal(), 4000);
+    } else {
+      this.registerError = registrationResult.message || 'Une erreur est survenue lors de l\'inscription.';
+      console.error('AuthComponent: Échec inscription apprenant.', registrationResult);
+    }
   }
 
-  // Soumission du formulaire d'inscription Formateur
   onRegisterFormateurSubmit(): void {
     this.registerError = null;
     this.registerSuccess = null;
-    console.log('Inscription Formateur soumise :', this.registerFormateurData);
+    console.log('AuthComponent: onRegisterFormateurSubmit appelé avec:', this.registerFormateurData);
 
-    if (!this.registerFormateurData.organizationName || !this.registerFormateurData.email || !this.registerFormateurData.password) {
-      this.registerError = "Tous les champs sont obligatoires.";
+    if (!this.registerFormateurData.name || !this.registerFormateurData.email || !this.registerFormateurData.password) {
+      this.registerError = 'Nom, email et mot de passe sont obligatoires pour le formateur.';
+      console.warn('AuthComponent: Validation inscription formateur échouée.');
       return;
     }
-    // Simulation
-    this.registerSuccess = `Compte Formateur pour ${this.registerFormateurData.organizationName} créé !`;
-    // setTimeout(() => this.closeRegisterModal(), 2000);
+
+    const userDataForAuth = {
+      name: this.registerFormateurData.name,
+      email: this.registerFormateurData.email,
+      password: this.registerFormateurData.password,
+    };
+    // Pour le formateur, nous ne passons pas de 'details' de type Person selon ce modèle.
+    // Si le formateur avait des champs spécifiques (comme organizationName DANS Person), on les passerait.
+    // Ici, organizationName est dans registerFormateurData mais pas directement utilisé par Person.
+
+    const registrationResult = this.authService.registerUser(userDataForAuth, 'formateur');
+
+    if (registrationResult.success) {
+      this.registerSuccess = `Compte Formateur pour ${this.registerFormateurData.name} créé avec succès ! Vous pouvez maintenant vous connecter.`;
+      console.log('AuthComponent: Inscription formateur réussie.', registrationResult);
+      this.resetRegisterForms();
+      // Optionnel: fermer la modale après un délai
+      // setTimeout(() => this.closeRegisterModal(), 4000);
+    } else {
+      this.registerError = registrationResult.message || 'Une erreur est survenue lors de l\'inscription.';
+      console.error('AuthComponent: Échec inscription formateur.', registrationResult);
+    }
   }
 
-  // Helper pour réinitialiser les formulaires d'inscription
-  private resetRegisterForm(): void {
-    this.registerBaseData = { email: '', password: '' };
+  private resetRegisterForms(): void {
+    // Réinitialisation pour Apprenant
     this.registerApprenantData = {
-      ...this.registerBaseData, name: '', genre: '', aisanceFrancais: 0,
+      name: '', email: '', password: '', genre: '', aisanceFrancais: 0,
       ancienDWWM: false, niveauTechnique: 0, profil: '', age: null
     };
-    this.registerFormateurData = { ...this.registerBaseData, name: '', organizationName: '' };
+    // Réinitialisation pour Formateur
+    this.registerFormateurData = {
+      name: '', email: '', password: '', organizationName: ''
+    };
     this.registerError = null;
-    this.registerSuccess = null;
+    this.registerSuccess = null; // Aussi réinitialiser le message de succès
   }
 }

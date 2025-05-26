@@ -1,12 +1,12 @@
-// src/app/core/models/user.model.ts (si tu crées un dossier models)
-// ou src/app/core/services/user.model.ts
-export type UserRole = 'apprenant' | 'formateur';
+export type UserRole = 'apprenant' | 'formateur' | 'admin'; // Ajout d'admin au cas où, sinon retire-le
 
 export interface User {
-  id: number;
+  id: string;
   email: string;
-  name?: string; // Nom de l'utilisateur ou de l'organisation
+  name: string;
+  password?: string; // Le mot de passe ne devrait pas toujours être exposé, mais nécessaire pour la simulation
   role: UserRole;
-  // Tu pourrais ajouter d'autres propriétés ici si nécessaire
-  // NE JAMAIS STOCKER LE MOT DE PASSE EN CLAIR ICI DANS UN VRAI PROJET
+  // genre?: string;
+  // age?: number;
+  // etc.
 }

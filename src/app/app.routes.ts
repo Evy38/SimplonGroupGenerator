@@ -1,32 +1,56 @@
+// Dans app.routes.ts
 import { Routes } from '@angular/router';
 import { AuthComponent } from './pages/auth/auth.component';
 import { authGuard } from './core/guards/auth.guard';
 import { FormateurLayoutComponent } from './features/formateur/formateur-layout/formateur-layout.component';
-import { FormateurDashboardComponent } from './features/formateur/formateur-dashboard/formateur-dashboard.component'; // Peut-être une page d'accueil du formateur
+import { FormateurDashboardComponent } from './features/formateur/formateur-dashboard/formateur-dashboard.component';
 import { PromoListComponent } from './features/formateur/promo-list/promo-list.component';
 import { BriefListComponent } from './features/formateur/brief-list/brief-list.component';
 import { ProfileComponent } from './pages/profile/profile.component';
-import { BriefDetailComponent } from '../app/features/formateur/brief-detail/brief-detail.component';
+import { BriefDetailComponent } from './features/formateur/brief-detail/brief-detail.component';
+// Importe tes composants pour la section Apprenant si tu en as
+import { ApprenantLayoutComponent } from './features/apprenant/apprenant-layout/apprenant-layout.component';
+import { ApprenantDashboardComponent } from './features/apprenant/apprenant-dashboard/apprenant-dashboard.component';
 
 
 export const routes: Routes = [
-  { path: '', component: AuthComponent },
+  // 1. Route explicite pour l'authentification
+  {
+    path: 'auth',
+    component: AuthComponent,
+    // Tu pourrais ajouter un guard ici pour rediriger si déjà connecté,
+    // mais la logique dans AuthComponent.ngOnInit s'en charge déjà.
+  },
+
+  // 2. Section Formateur (protégée)
   {
     path: 'formateur',
-    component: FormateurLayoutComponent, // Le layout principal pour la section formateur
+    component: FormateurLayoutComponent,
     canActivate: [authGuard],
     data: { expectedRole: 'formateur' },
-    children: [ // Routes enfants qui s'afficheront dans le <router-outlet> de FormateurLayoutComponent
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, // Rediriger /formateur vers /formateur/dashboard
-      { path: 'dashboard', component: FormateurDashboardComponent }, // Page d'accueil de la section formateur
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: FormateurDashboardComponent },
       { path: 'promos', component: PromoListComponent },
       { path: 'briefs', component: BriefListComponent },
-      { path: 'profil', component: ProfileComponent, },
       { path: 'briefs/:id', component: BriefDetailComponent },
-
+      { path: 'profil', component: ProfileComponent }, // Profil accessible depuis la section formateur
     ]
   },
 
-  { path: '', redirectTo: '/login', pathMatch: 'full' }, // Redirection par défaut si aucune route ne correspond
-  { path: '**', redirectTo: '/login' }
+  {
+    path: 'apprenant',
+    component: ApprenantLayoutComponent, // Remplace par ton layout/composant apprenant
+    canActivate: [authGuard],
+    data: { expectedRole: 'apprenant' },
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: ApprenantDashboardComponent }, // Ta page d'accueil apprenant
+      // ... autres routes spécifiques à l'apprenant ...
+      { path: 'profil', component: ProfileComponent }, // Profil accessible depuis la section apprenant
+    ]
+  },
+
+  { path: '', redirectTo: '/auth', pathMatch: 'full' },
+  { path: '**', redirectTo: '/auth' }
 ];
