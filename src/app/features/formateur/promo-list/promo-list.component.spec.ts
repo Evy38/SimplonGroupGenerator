@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GroupListComponent } from './promo-list.component';
+import { PromoListComponent } from './promo-list.component';
 
 describe('GroupListComponent', () => {
-  let component: GroupListComponent;
-  let fixture: ComponentFixture<GroupListComponent>;
+  let component: PromoListComponent;
+  let fixture: ComponentFixture<PromoListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupListComponent]
+      imports: [PromoListComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GroupListComponent);
+    fixture = TestBed.createComponent(PromoListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
