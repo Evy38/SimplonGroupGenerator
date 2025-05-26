@@ -2,30 +2,47 @@
   <h1>Mes Briefs</h1>
 </header>
 
-<div class="brief-cards-container" [class.blurred]="isCreateBriefModalOpen">
-  @for (brief of briefs; track brief.id) {
-    <!-- Pour l'instant, le clic sur la carte ne fait rien, on ajoutera le routerLink vers le détail plus tard -->
-   <div class="brief-card" [routerLink]="['/formateur/briefs', brief.id]">
-    <div class="brief-card-main-content"> <!-- Ce wrapper est clé -->
-        <div class="brief-card-image">
-            <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.name">
-        </div>
-        <div class="brief-card-content">
+<div class="brief-cards-container" [class.blurred]="isCreateBriefModalOpen || isConfirmDeleteModalOpen">
+  <!-- MODIFICATION: Utilisation de briefs$ avec le pipe async et la nouvelle syntaxe @for -->
+  @if (briefs$ | async; as resolvedBriefs) {
+    @for (brief of resolvedBriefs; track brief.id) {
+      <div class="brief-card" [routerLink]="['/formateur/briefs', brief.id]">
+        <div class="brief-card-main-content">
+          <div class="brief-card-image">
+            <img [src]="brief.imageUrl || 'assets/G.png'" [alt]="'Image pour ' + brief.name"> <!-- Ajout d'une image par défaut -->
+          </div>
+          <div class="brief-card-content">
             <h3 class="brief-name">{{ brief.name }}</h3>
             <p class="brief-description">{{ brief.description | slice:0:70 }}{{ brief.description.length > 70 ? '...' : '' }}</p>
-            <p class="brief-assigned-group">Groupe: <strong>{{ getGroupName(brief.assignedGroupId) }}</strong></p>
+            <!-- MODIFICATION: On affiche le sourceGroupId pour l'instant.
+                 Pour afficher le nom de la promo, il faudra une fonction helper et passer resolvedPromos.
+                 Ou, si tu as une propriété `promoName` directement sur l'objet brief après l'avoir chargé. -->
+            <p class="brief-assigned-group">Promo : <strong>{{ brief.id }}</strong></p>
+            <!-- Si tu veux garder l'affichage de 'assignedGroupId' comme avant,
+                 et que getGroupName prend maintenant la liste des promos (ou un autre observable),
+                 il faudra l'adapter.
+                 Exemple si getGroupName est modifié pour prendre un tableau de promos :
+                 <p class="brief-assigned-group">Groupe Assigné: <strong>{{ getGroupName(brief.assignedGroupId, (promos$ | async)) }}</strong></p>
+            -->
+          </div>
         </div>
-    </div>
-    <div class="brief-card-actions">
-        <button type="button" class="icon-button edit-button" title="Modifier le brief" (click)="openEditBriefModal(brief); $event.stopPropagation();"><img src="assets/pen.png"></button>
-         <button type="button" class="icon-button delete-button" title="Supprimer le brief"
-            (click)="openConfirmDeleteModal(brief, $event)"> <!-- Vérifie cet appel -->
-        <img src="assets/trash.png" alt="Supprimer">
-    </button>
-    </div>
-</div>
-  } @empty {
-    <p class="empty-list-message">Vous n'avez pas encore de briefs. Commencez par en créer un !</p>
+        <div class="brief-card-actions">
+          <button type="button" class="icon-button edit-button" title="Modifier le brief" (click)="openEditBriefModal(brief); $event.stopPropagation();">
+            <img src="assets/pen.png" alt="Modifier">
+          </button>
+          <!-- MODIFICATION: openConfirmDeleteModal prendra l'ID du brief et non l'objet entier -->
+          <button type="button" class="icon-button delete-button" title="Supprimer le brief"
+                  (click)="openConfirmDeleteModal(brief.id, brief.name, $event); $event.stopPropagation();">
+            <img src="assets/trash.png" alt="Supprimer">
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <p class="empty-list-message">Vous n'avez pas encore de briefs. Commencez par en créer un !</p>
+    }
+  } @else {
+    <!-- Optionnel: Message pendant que briefs$ n'a pas encore émis -->
+    <p class="empty-list-message">Chargement des briefs...</p>
   }
 </div>
 
@@ -63,15 +80,38 @@
                     [(ngModel)]="currentBriefData.description"></textarea>
         </div>
 
+        <!-- MODIFICATION: Champ pour sélectionner la PROMO SOURCE -->
+        <div class="form-group">
+          <label for="brief-promo-source">Assigner à une Promo Source :</label>
+          <!-- On utilise promos$ ici -->
+          @if (promos$ | async; as resolvedPromos) {
+            <select id="brief-promo-source" name="briefPromoSource" [(ngModel)]="currentBriefData.sourceGroupId" required>
+              <option [ngValue]="null" disabled>-- Choisir une promo source --</option>
+              @for (promo of resolvedPromos; track promo.id) {
+                <option [value]="promo.id">{{ promo.name }}</option>
+              }
+            </select>
+          } @else {
+            <p>Chargement des promos...</p>
+          }
+        </div>
+
+        <!-- Ton ancien champ pour 'assignedGroupId'. Si 'availableGroups' est maintenant 'promos$',
+             et que 'assignedGroupId' doit aussi choisir parmi les promos, tu peux adapter.
+             Si 'assignedGroupId' est lié à une autre liste, il faudra un autre Observable.
+             Pour l'instant, je le commente pour se concentrer sur sourceGroupId.
         <div class="form-group">
           <label for="brief-assign-group">Affilier à un groupe existant (optionnel) :</label>
           <select id="brief-assign-group" name="briefAssignGroup" [(ngModel)]="currentBriefData.assignedGroupId">
-            <option [ngValue]="null">-- Aucun groupe --</option> <!-- Utiliser [ngValue] pour null -->
-            @for (group of availableGroups; track group.id) {
-              <option [value]="group.id">{{ group.name }}</option>
+            <option [ngValue]="null">-- Aucun groupe --</option>
+            @if (promos$ | async; as resolvedPromosForAssignment) { <!- Exemple si c'est la même liste ->
+              @for (group of resolvedPromosForAssignment; track group.id) {
+                <option [value]="group.id">{{ group.name }}</option>
+              }
             }
           </select>
         </div>
+        -->
 
         @if (formError) { <p class="error-message">{{ formError }}</p> }
         @if (formSuccess) { <p class="success-message">{{ formSuccess }}</p> }
@@ -84,15 +124,34 @@
     </div>
   </div>
 }
+
 <!-- MODALE DE CONFIRMATION DE SUPPRESSION -->
-@if (isConfirmDeleteModalOpen && briefToDelete) {
+<!-- MODIFICATION: briefToDelete est remplacé par briefToDeleteId.
+     Pour afficher le nom, il faudrait soit le passer à la méthode d'ouverture,
+     soit le retrouver dans resolvedBriefs en utilisant briefToDeleteId.
+     Pour simplifier, on peut juste afficher l'ID ou un message générique. -->
+@if (isConfirmDeleteModalOpen) {
   <div class="modal-overlay confirm-delete-modal-overlay" (click)="closeConfirmDeleteModal()">
     <div class="modal-content confirm-delete-modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Confirmer la Suppression</h2>
       </div>
       <div class="modal-body">
-        <p>Êtes-vous sûr de vouloir supprimer le brief "<strong>{{ briefToDelete.name }}</strong>" ?</p>
+        <!-- Tentative d'afficher le nom du brief à supprimer.
+             Cela suppose que vous avez accès à 'resolvedBriefs' ici, ce qui n'est pas direct.
+             Une solution plus simple serait de stocker le nom du brief dans le composant TS
+             lors de l'ouverture de la modale, en plus de l'ID.
+             Ou, pour l'instant, afficher un message plus générique. -->
+        @if (briefToDeleteId && (briefs$ | async); as allBriefs) {
+          <!-- On cherche le brief par ID pour afficher son nom -->
+          @for (b of allBriefs; track b.id) {
+            @if (b.id === briefToDeleteId) {
+              <p>Êtes-vous sûr de vouloir supprimer le brief "<strong>{{ b.name }}</strong>" ?</p>
+            }
+          }
+        } @else {
+          <p>Êtes-vous sûr de vouloir supprimer ce brief ?</p>
+        }
         <p class="warning-text">Cette action est irréversible.</p>
       </div>
       <div class="modal-footer buttons confirm-delete-buttons">

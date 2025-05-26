@@ -3,124 +3,138 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Brief } from '../../../core/services/models/brief.model'; // Ajuste le chemin
-import { Group } from '../../../core/services/models/group.model'; // Pour la sélection de groupe
-// Tu auras besoin d'un service pour charger les groupes existants
-import { PromoService } from '../../../core/services/promo.service'; 
+import { Observable } from 'rxjs'; // <-- NOUVEAU: Import pour Observable
+import { tap } from 'rxjs/operators';
+
+import { Brief } from '../../../core/services/models/brief.model';         // Ajusté pour pointer vers models et non services/models
+import { Group } from '../../../core/services/models/group.model';         // Ajusté pour pointer vers models et non services/models
+
+// --- NOUVEAUX IMPORTS POUR LES SERVICES ---
+import { BriefService } from '../../../core/services/brief.service';
+import { PromoService } from '../../../core/services/promo.service';
 
 @Component({
   selector: 'app-brief-list',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './brief-list.component.html',
-  styleUrls: ['./brief-list.component.css'] // Pluriel pour styleUrls
+  styleUrls: ['./brief-list.component.css']
 })
 export class BriefListComponent implements OnInit {
-  briefs: Brief[] = [];
+  // --- MODIFICATION: Remplacer les tableaux locaux par des Observables ---
+  briefs$: Observable<Brief[]>;      // Anciennement: briefs: Brief[] = [];
+  promos$: Observable<Group[]>;      // Anciennement: availableGroups: Group[] = []; (sera utilisé pour les promos sources)
+
+    private allPromos: Group[] = [];
   isCreateBriefModalOpen: boolean = false;
 
-  // Pour le formulaire de création/modification de brief
-  currentBriefData = {
+  // --- MODIFICATION: currentBriefData doit inclure 'id' et 'sourceGroupId' ---
+  currentBriefData: {
+    id: string | null; // Pour savoir si on édite (l'ID du brief) ou crée (null)
+    name: string;
+    description: string;
+    imageUrl: string;
+    sourceGroupId: string | number | null; // L'ID de la PROMO SOURCE assignée
+    assignedGroupId: string | number | null; // Gardé pour ta logique existante, mais focus sur sourceGroupId
+  } = {
+    id: null,
     name: '',
     description: '',
     imageUrl: '',
-    assignedGroupId: null as (number | string | null) // Pour l'ID du groupe sélectionné
+    sourceGroupId: null, // Initialisé à null
+    assignedGroupId: null
   };
-
-  availableGroups: Group[] = []; // Liste des groupes existants à affilier
 
   formError: string | null = null;
   formSuccess: string | null = null;
 
   isEditMode: boolean = false;
-  briefToEdit: Brief | null = null;
+  // briefToEdit n'est plus aussi central, currentBriefData.id indique le mode édition.
+  // On peut le supprimer ou le garder si une logique spécifique en dépend encore.
+  // Pour l'instant, je le commente pour simplifier, on se basera sur currentBriefData.id
+  // briefToEdit: Brief | null = null;
 
   isConfirmDeleteModalOpen: boolean = false;
-  briefToDelete: Brief | null = null;
+  briefToDeleteId: string | null = null; // On stockera l'ID du brief à supprimer
 
-  // Pas de modale de confirmation de suppression pour l'instant, on peut l'ajouter plus tard
+  briefNameToDelete: string | null = null;
 
-  constructor(
-    // private groupService: GroupService // Exemple: injecter un service pour les groupes
-  ) { }
+  // --- MODIFICATION: Injection des services ---
+constructor(
+    private briefService: BriefService,
+    private promoService: PromoService
+  ) {
+    this.briefs$ = this.briefService.briefs$;
+    this.promos$ = this.promoService.promos$.pipe(
+      tap((promos: Group[]) => {
+        this.allPromos = promos; // Stocker la liste des promos quand elle arrive
+        console.log('Promos stockées localement dans BriefListComponent:', this.allPromos);
+      })
+    );
+  }
 
   ngOnInit(): void {
-    this.loadBriefs();
-    this.loadAvailableGroups(); // Charger les groupes pour la sélection
+    // --- MODIFICATION: Plus besoin de charger manuellement ---
+    // Les données sont maintenant fournies par les Observables briefs$ et promos$.
+    // this.loadBriefs(); // Supprimé
+    // this.loadAvailableGroups(); // Supprimé
+
+    // Optionnel: Logs pour vérifier que les données arrivent bien des services
+    this.briefs$.subscribe(briefs => {
+      console.log('Briefs chargés depuis BriefService:', briefs);
+      if (!briefs || briefs.length === 0) {
+          console.warn("Aucun brief chargé depuis BriefService. Vérifiez INITIAL_BRIEFS_DATA dans BriefService.");
+      }
+    });
+    this.promos$.subscribe(promos => {
+      console.log('Promos (pour la sélection de sourceGroupId) chargées depuis PromoService:', promos);
+      if (!promos || promos.length === 0) {
+          console.warn("Aucune promo chargée depuis PromoService. La sélection de la promo source dans la modale sera vide.");
+      }
+    });
   }
 
-  loadBriefs(): void {
-    // Données simulées (plus tard, viendra d'un service)
-    this.briefs = [
-      {
-        id: 'brf1',
-        name: 'Projet Portfolio V1',
-        description: 'Création d\'un portfolio pour présenter les projets...', // Votre description
-        imageUrl: 'assets/portfolio.png', // Assurez-vous que ce chemin est correct ou gérez-le
-        assignedGroupId: 'grp2',
-        sourceGroupId: 'idGroupeSourcePourBrf1' // <--- AJOUTEZ CECI (avec une valeur appropriée)
-      },
-      {
-        id: 'brf2',
-        name: 'Application de Gestion de Tâches',
-        description: 'Développement d\'une application web pour la gestion...', // Votre description
-        imageUrl: 'assets/taches.png', // Assurez-vous que ce chemin est correct ou gérez-le
-        // assignedGroupId: 'valeurSiApplicable', // S'il y en a un
-        sourceGroupId: 'idGroupeSourcePourBrf2' // <--- AJOUTEZ CECI (avec une valeur appropriée)
-      },
-      {
-        id: 'brf3',
-        name: 'Clone de Twitter (Simplifié)',
-        description: 'Reproduction des fonctionnalités principales de la plateforme...', // Votre description
-        imageUrl: 'assets/twitter.png', // Assurez-vous que ce chemin est correct ou gérez-le
-        assignedGroupId: 'grp1',
-        sourceGroupId: 'idGroupeSourcePourBrf3' // <--- AJOUTEZ CECI (avec une valeur appropriée)
-      },
-      // ... autres briefs
-    ];
-  }
-
-  loadAvailableGroups(): void {
-    // Simuler la récupération des groupes existants.
-    // Dans une vraie app, cela viendrait d'un GroupService qui récupère this.groups de GroupListComponent ou une source de données.
-    // Pour la démo, on peut copier quelques groupes ici ou créer une source partagée (via un service).
-    // Supposons que tu as une liste de groupes quelque part :
-    const person1 = { id: 1, nom: 'P1' }; const person2 = { id: 2, nom: 'P2' };
-    this.availableGroups = [
-      { id: 'grp1', name: 'Les Marmottes', members: [person1, person2] },
-      { id: 'grp2', name: 'Les Poneys', members: [person1] },
-      { id: 'grp3', name: 'Les Chatons', members: [person2] },
-    ];
-  }
-
+  
   // --- Gestion de la modale de création/modification de Brief ---
   openCreateBriefModal(): void {
     this.isEditMode = false;
-    this.briefToEdit = null;
+    // this.briefToEdit = null; // Commenté car on se base sur currentBriefData.id
     this.isCreateBriefModalOpen = true;
-    this.currentBriefData = { name: '', description: '', imageUrl: '', assignedGroupId: null };
+    // Réinitialise currentBriefData pour une nouvelle création
+    this.currentBriefData = {
+      id: null, // Important: id est null en mode création
+      name: '',
+      description: '',
+      imageUrl: '',
+      sourceGroupId: null, // Important: la promo source n'est pas encore sélectionnée
+      assignedGroupId: null
+    };
     this.formError = null;
     this.formSuccess = null;
   }
 
   openEditBriefModal(brief: Brief): void {
     this.isEditMode = true;
-    this.briefToEdit = { ...brief }; // Copie
+    // this.briefToEdit = { ...brief }; // Commenté
     this.isCreateBriefModalOpen = true;
+    // Pré-remplit currentBriefData avec les infos du brief à éditer
     this.currentBriefData = {
+      id: brief.id, // Important: on stocke l'id du brief
       name: brief.name,
       description: brief.description,
       imageUrl: brief.imageUrl || '',
+      sourceGroupId: brief.sourceGroupId, // Important: on récupère la promo source actuelle
       assignedGroupId: brief.assignedGroupId || null
     };
     this.formError = null;
     this.formSuccess = null;
+    console.log("Ouverture modale pour édition, currentBriefData:", this.currentBriefData);
   }
 
   closeCreateBriefModal(): void {
     this.isCreateBriefModalOpen = false;
     this.isEditMode = false;
-    this.briefToEdit = null;
+    // this.briefToEdit = null; // Commenté
   }
 
   onSaveBriefSubmit(): void {
@@ -131,78 +145,86 @@ export class BriefListComponent implements OnInit {
       this.formError = "Le nom et la description du brief sont obligatoires.";
       return;
     }
+    // --- NOUVELLE VÉRIFICATION: S'assurer qu'une promo source est sélectionnée ---
+    if (this.currentBriefData.sourceGroupId === null || this.currentBriefData.sourceGroupId === undefined) {
+      this.formError = "Veuillez assigner ce brief à une promo source.";
+      return;
+    }
 
-    if (this.isEditMode && this.briefToEdit) {
+    // Préparer l'objet brief avec les données du formulaire
+    // On utilise Omit<Brief, 'id'> car l'ID est géré par le service pour la création,
+    // ou déjà présent dans currentBriefData.id pour la modification.
+    const briefPayload: Omit<Brief, 'id' | 'assignedGroupId'> & { assignedGroupId?: string | number | null, imageUrl?: string } = {
+      name: this.currentBriefData.name,
+      description: this.currentBriefData.description,
+      imageUrl: this.currentBriefData.imageUrl || undefined,
+      sourceGroupId: this.currentBriefData.sourceGroupId, // Utilise la valeur de la modale
+      // assignedGroupId est optionnel ici, si tu veux le gérer différemment
+      // Si tu veux qu'il soit toujours envoyé, même si null:
+      assignedGroupId: this.currentBriefData.assignedGroupId
+    };
+
+    if (this.isEditMode && this.currentBriefData.id) {
       // --- LOGIQUE DE MODIFICATION ---
-      const briefIndex = this.briefs.findIndex(b => b.id === this.briefToEdit!.id);
-      if (briefIndex > -1) {
-        this.briefs[briefIndex] = {
-          ...this.briefs[briefIndex], // Garder l'id et autres props non modifiées
-          name: this.currentBriefData.name,
-          description: this.currentBriefData.description,
-          imageUrl: this.currentBriefData.imageUrl || undefined,
-          assignedGroupId: this.currentBriefData.assignedGroupId
-        };
-        this.formSuccess = `Brief '${this.briefs[briefIndex].name}' modifié !`;
-      } else {
-        this.formError = "Erreur : Brief à modifier non trouvé.";
-      }
+      const briefToUpdate: Brief = {
+        ...briefPayload,
+        id: this.currentBriefData.id // On ajoute l'ID pour la mise à jour
+      };
+      console.log('SIMULATION: Prêt à appeler briefService.updateBrief() avec:', briefToUpdate);
+      // À FAIRE PROCHAINEMENT: this.briefService.updateBrief(briefToUpdate);
+      this.formSuccess = `Brief '${briefToUpdate.name}' (simulation) modifié ! Vérifiez la console.`;
     } else {
       // --- LOGIQUE DE CRÉATION ---
-      const newId = `brf${Date.now()}`;
-      const newBrief: Brief = {
-        id: newId,
-        name: this.currentBriefData.name,
-        description: this.currentBriefData.description,
-        imageUrl: this.currentBriefData.imageUrl || undefined,
-        assignedGroupId: this.currentBriefData.assignedGroupId,
-        sourceGroupId: this.currentBriefData.assignedGroupId ?? '' // Ajout d'une valeur pour sourceGroupId (jamais null)
-      };
-      this.briefs.push(newBrief);
-      this.formSuccess = `Brief '${newBrief.name}' créé !`;
+      console.log('SIMULATION: Prêt à appeler briefService.addBrief() avec:', briefPayload);
+ this.briefService.addBrief(briefPayload as Omit<Brief, 'id'>);
+      // Le 'as' est pour typer correctement, car addBrief attendra un objet sans 'id'.
+      this.formSuccess = `Brief '${briefPayload.name}' (simulation) créé ! Vérifiez la console.`;
     }
 
     setTimeout(() => {
       this.closeCreateBriefModal();
-      this.formSuccess = null;
-      this.formError = null;
+      // this.formSuccess = null; // Se réinitialise à la prochaine ouverture
+      // this.formError = null;
     }, 2000);
   }
 
-  // Logique de suppression (simplifiée, sans confirmation pour l'instant)
-  deleteBrief(briefId: number | string, event: MouseEvent): void {
-    event.stopPropagation(); // Empêche le clic de déclencher la navigation du parent
-    // TODO: Ajouter une modale de confirmation ici
-    console.log('Suppression demandée pour le brief ID:', briefId);
-    this.briefs = this.briefs.filter(b => b.id !== briefId);
-  }
-
-  getGroupName(groupId: number | string | null | undefined): string {
-    if (!groupId) return 'Aucun groupe assigné';
-    const group = this.availableGroups.find(g => g.id === groupId);
+  // Si tu veux afficher le nom de la promo source dans ta liste principale,
+  // tu devras passer `promos$ | async` à cette fonction.
+  // Pour l'instant, je la commente car elle n'est pas directement utilisée avec `promos$`.
+  /*
+  getGroupName(groupId: number | string | null | undefined, promos: Group[] | null): string {
+    if (!groupId || !promos) return 'Aucun groupe assigné';
+    const group = promos.find(g => g.id === groupId);
     return group ? group.name : 'Groupe inconnu';
   }
+  */
 
-  // Méthode pour ouvrir la modale (appelée depuis l'icône poubelle sur une carte de brief)
-  openConfirmDeleteModal(briefASupprimer: Brief, event: MouseEvent): void {
+  // Méthode pour ouvrir la modale de confirmation de suppression
+ openConfirmDeleteModal(briefId: string, briefName: string, event: MouseEvent): void { // Ajoute briefName
     event.stopPropagation();
-    this.briefToDelete = briefASupprimer;
+    this.briefToDeleteId = briefId;
+    this.briefNameToDelete = briefName; // Stocke le nom
     this.isConfirmDeleteModalOpen = true;
-  }
+}
 
-  closeConfirmDeleteModal(): void {
+ closeConfirmDeleteModal(): void {
     this.isConfirmDeleteModalOpen = false;
-    this.briefToDelete = null;
-  }
+    this.briefToDeleteId = null;
+    this.briefNameToDelete = null; // Réinitialise
+}
 
   // Méthode appelée par le bouton "Supprimer" de la modale
-  confirmDeleteBrief(): void { // Renommée pour plus de clarté
-    if (this.briefToDelete) {
-      console.log('Suppression du brief:', this.briefToDelete.name);
-      // Logique pour supprimer le brief de ta liste (ou appeler un service)
-      this.briefs = this.briefs.filter(b => b.id !== this.briefToDelete!.id);
+  confirmDeleteBrief(): void {
+    if (this.briefToDeleteId) {
+      console.log('SIMULATION: Prêt à appeler briefService.deleteBrief() avec ID:', this.briefToDeleteId);
+      this.briefService.deleteBrief(this.briefToDeleteId);
+      this.formSuccess = `Brief (ID: ${this.briefToDeleteId}) (simulation) supprimé ! Vérifiez la console.`;
       this.closeConfirmDeleteModal();
+      // setTimeout(() => this.formSuccess = null, 2000); // Déplacé pour être plus cohérent
     }
+     setTimeout(() => { // Mis ici pour s'assurer qu'il s'exécute après la logique principale
+      this.formSuccess = null;
+      this.formError = null;
+    }, 2500);
   }
-
 }

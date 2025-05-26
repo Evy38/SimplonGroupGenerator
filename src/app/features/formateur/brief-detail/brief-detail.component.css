@@ -56,11 +56,12 @@
   grid-template-columns: 1fr;
   gap: 20px;
   margin-bottom: 80px;
+   
 }
 .work-group-card {
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.60); 
+ box-shadow: 0 2px 6px rgba(0,0,0,0.60); 
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -143,28 +144,34 @@
   color: #777;
   font-style: italic;
 }
-.fab-button.dice-fab { /* Styles pour le FAB spécifique avec l'icône de dé */
+.fab-button.dice-fab {
   position: fixed;
-  bottom: 20px; /* Moins de marge sur mobile */
+  bottom: 20px;
   right: 20px;
-  width: 56px;
-  height: 56px;
-  border: none;
+  width: auto;   /* Ajuste cette taille si ton image de dé est plus petite/grande */
+  height: auto;  /* Doit être égal à la largeur pour un cercle */
+  border: none;  /* Supprime toute bordure */
   cursor: pointer;
-  z-index: 900; /* Z-index cohérent */
+  z-index: 900;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  justify-content: center; 
   transition: transform 0.2s ease-out;
+  background-color: transparent; /* TRÈS IMPORTANT: Rend le fond du bouton transparent */
+ 
 }
+
 .fab-button.dice-fab img {
-  width: 50px; /* Taille de l'icône dans le FAB */
-  height: 50px;
-  display: block;
+  width: 50px;  
+  height: 50px; 
+  /* display: block; */
+   box-shadow: 3px 3px 8px rgba(0,0,0,0.8); 
 }
 .fab-button.dice-fab:hover {
-  transform: scale(1.05) rotate(180deg); /* Légère rotation au survol */
+  transform: scale(1.05) rotate(180deg); 
+   /* box-shadow: 3px 3px 8px rgba(0,0,0,0.8);  */
+   width: 90px;
+   height: 90px;
 }
 .fab-button.dice-fab:active {
   transform: scale(0.95) rotate(0deg); /* Effet de clic */
@@ -419,11 +426,12 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
   }
-  .fab-button.dice-fab {
+  /* .fab-button.dice-fab {
     bottom: 30px; right: 30px; width: 60px; height: 60px;
-  }
+  } */
   .fab-button.dice-fab img {
-    width: 32px; height: 32px;
+    width: 80px; height: 80px;
+     box-shadow: 3px 3px 8px rgba(0,0,0,0.8); 
   }
 
   /* --- Styles communs aux MODALES (grands écrans) --- */

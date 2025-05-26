@@ -193,7 +193,6 @@ export class PromoListComponent implements OnInit, OnDestroy {
     this.selectedPromoForMembers = null;
   }
 
-  
 
   // --- GESTION DE LA MODALE DE CONFIRMATION DE SUPPRESSION DE PROMO ---
   openConfirmDeletePromoModal(promo: Group): void {

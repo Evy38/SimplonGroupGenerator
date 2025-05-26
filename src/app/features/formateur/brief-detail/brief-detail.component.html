@@ -1,21 +1,19 @@
 <!-- src/app/features/formateur/brief-detail/brief-detail.component.html -->
-@if (brief) {
+<!-- MODIFICATION: Utiliser viewData$ avec le pipe async -->
+@if (viewData$ | async; as data) {
   <!-- SECTION HEADER: Affiche les détails du brief -->
   <header class="page-header brief-detail-header">
     <a routerLink="/formateur/briefs" class="back-to-list-link">← Retour à la liste des briefs</a>
-    <h1>{{ brief.name }}</h1>
-    @if (brief.imageUrl) {
-      <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.name" class="brief-detail-image">
-    }
-    <p class="brief-detail-description">{{ brief.description }}</p>
-     <!-- AFFICHER LE NOM DE LA PROMO SOURCE -->
+    <h1>{{ data.brief.name }}</h1>
+  
+    <p class="brief-detail-description">{{ data.brief.description }}</p>
     <p class="brief-promo-info">
-      <em>Promo source pour la génération :
+      <em>Promo associée :
         <strong>
-          {{ sourceGroupForBrief?.name || (brief.sourceGroupId ? 'Promo ID: ' + brief.sourceGroupId : 'Non définie') }}
+          {{ data.sourceGroup.name }}
         </strong>
-        @if (sourceGroupForBrief && sourceGroupForBrief.members) {
-          ({{ sourceGroupForBrief.members.length }} personnes)
+        @if (data.sourceGroup.members) {
+          ({{ data.sourceGroup.members.length }} personnes)
         }
       </em>
     </p>
@@ -24,11 +22,11 @@
   <!-- SECTION AFFICHAGE DES GROUPES DE TRAVAIL GÉNÉRÉS -->
   <section class="generated-work-groups-section">
     <h2>Sous-Groupes de Travail Générés</h2>
-    @if (generatedWorkGroups.length > 0) {
+    @if (generatedWorkGroups.length > 0) { <!-- generatedWorkGroups est toujours géré localement -->
       <div class="work-group-list-container">
         @for (group of generatedWorkGroups; track group.id) {
           <div class="work-group-card">
-            <div class="work-group-header" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}"> <!-- Cliquable pour voir membres -->
+            <div class="work-group-header" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
               <h4 class="work-group-name">{{ group.name }}</h4>
               <div class="work-group-actions">
                 <button type="button" class="icon-button simple-edit-button" title="Modifier ce sous-groupe"
@@ -41,9 +39,9 @@
                 </button>
               </div>
             </div>
-            <ul class="work-group-members-list" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}"> <!-- Cliquable pour voir membres -->
+            <ul class="work-group-members-list" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
               @for (member of group.members; track member.id; let count = $count) {
-                @if ($index < 3) { <!-- Afficher max 3 noms directement -->
+                @if ($index < 3) {
                   <li class="member-name-item">{{ member.nom }}</li>
                 }
               }
@@ -63,26 +61,29 @@
   </section>
 
   <!-- BOUTON FLOTTANT "DÉ" pour la génération -->
+  <!-- S'assurer que data.brief et data.sourceGroup existent avant d'afficher le bouton ou de l'activer -->
   <button type="button" class="fab-button dice-fab" (click)="openGenerateGroupsModal()" title="Générer des sous-groupes de travail">
     <img src="assets/dés.png" alt="Générer groupes">
   </button>
 
 
   <!-- MODALE DE GÉNÉRATION DE SOUS-GROUPES (AVEC LE "DÉ") -->
-  @if (isGenerateGroupsModalOpen && brief && sourceGroupForBrief) {
+  <!-- data.brief et data.sourceGroup viennent de viewData$ | async -->
+  @if (isGenerateGroupsModalOpen && data.brief && data.sourceGroup) {
     <div class="modal-overlay full-screen-modal-overlay" (click)="closeGenerateGroupsModal()">
       <div class="modal-content large-modal-content generate-groups-modal" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeGenerateGroupsModal()" aria-label="Fermer">×</button>
         <div class="modal-header">
-          <h2>Générer des Sous-Groupes pour "{{ brief.name }}"</h2>
-          <p>À partir de la promo : <strong>{{ sourceGroupForBrief.name }}</strong> ({{sourceGroupForBrief.members.length}} personnes)</p>
+          <h2>Générer des Sous-Groupes pour "{{ data.brief.name }}"</h2>
+          <p>À partir de la promo : <strong>{{ data.sourceGroup.name }}</strong> ({{data.sourceGroup.members.length || 0}} personnes)</p>
         </div>
-        <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()">
+        <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()"> <!-- onGenerateGroupsSubmit utilisera this.sourceGroupForBrief -->
           <div class="form-group">
             <label for="gen-people-per-group">Nombre de personnes par sous-groupe :</label>
             <input type="number" id="gen-people-per-group" name="genPeoplePerGroup"
-                   [(ngModel)]="generationCriteria.peoplePerGroup" min="1" [max]="sourceGroupForBrief.members.length" required>
+                   [(ngModel)]="generationCriteria.peoplePerGroup" min="1" [max]="data.sourceGroup.members.length || 1" required>
           </div>
+          <!-- ... reste des critères de la modale de génération ... -->
           <h4 class="criteria-title">Critères de Mixité :</h4>
           <div class="form-group checkbox-group">
             <input type="checkbox" id="critere-dwwm" name="critereDwwm" [(ngModel)]="generationCriteria.mixAncienDWWM">
@@ -116,18 +117,19 @@
         </form>
       </div>
     </div>
-  } <!-- Fin modale génération de groupes -->
+  }
 
-
-  <!-- NOUVEAU (ou réactivé): MODALE POUR AFFICHER LES MEMBRES D'UN SOUS-GROUPE DE TRAVAIL -->
+  <!-- MODALE POUR AFFICHER LES MEMBRES D'UN SOUS-GROUPE DE TRAVAIL -->
+  <!-- selectedWorkGroupForMembers est toujours géré localement -->
   @if (isMembersModalOpen && selectedWorkGroupForMembers) {
-    <div class="modal-overlay members-modal-overlay" (click)="closeWorkGroupMembersModal()"> <!-- Classe overlay spécifique si besoin -->
-      <div class="modal-content members-modal-content" (click)="$event.stopPropagation()"> <!-- Classe contenu spécifique -->
+    <!-- ... Contenu de la modale des membres ... (pas de changement ici car elle dépend de selectedWorkGroupForMembers) -->
+    <div class="modal-overlay members-modal-overlay" (click)="closeWorkGroupMembersModal()">
+      <div class="modal-content members-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeWorkGroupMembersModal()" aria-label="Fermer">×</button>
         <div class="modal-header">
           <h2>Membres du sous-groupe : {{ selectedWorkGroupForMembers.name }}</h2>
         </div>
-        <div class="modal-body members-list-body"> <!-- Classe body spécifique -->
+        <div class="modal-body members-list-body">
           @if (selectedWorkGroupForMembers.members && selectedWorkGroupForMembers.members.length > 0) {
             <ul class="members-ul">
               @for (member of selectedWorkGroupForMembers.members; track member.id) {
@@ -149,18 +151,19 @@
             <p>Aucun membre dans ce sous-groupe.</p>
           }
         </div>
-        <div class="modal-footer buttons"> <!-- Réutiliser la classe .buttons si stylée globalement -->
+        <div class="modal-footer buttons">
           <button type="button" class="button-secondary" (click)="closeWorkGroupMembersModal()">Fermer</button>
         </div>
       </div>
     </div>
-  } <!-- Fin modale affichage membres -->
-
+  }
 
   <!-- MODALE DE MODIFICATION D'UN SOUS-GROUPE DE TRAVAIL -->
-  @if (isEditWorkGroupModalOpen && selectedWorkGroupToEdit && editableWorkGroupData && sourceGroupForBrief) {
-    <div class="modal-overlay" (click)="closeEditWorkGroupModal()"> <!-- Tu peux utiliser une classe overlay spécifique si besoin -->
-      <div class="modal-content large-modal-content" (click)="$event.stopPropagation()"> <!-- Tu peux utiliser une classe contenu spécifique si besoin -->
+  <!-- Utiliser data.sourceGroup pour getAvailablePeopleForEditingGroup -->
+  @if (isEditWorkGroupModalOpen && selectedWorkGroupToEdit && editableWorkGroupData && data.sourceGroup) {
+    <!-- ... Contenu de la modale d'édition ... (pas de changement majeur ici, mais s'assurer que getAvailablePeopleForEditingGroup() a accès à data.sourceGroup si besoin) -->
+     <div class="modal-overlay" (click)="closeEditWorkGroupModal()">
+      <div class="modal-content large-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeEditWorkGroupModal()" aria-label="Fermer">×</button>
         <div class="modal-header">
           <h2>Modifier le Sous-Groupe : {{ editableWorkGroupData.name }}</h2>
@@ -170,8 +173,6 @@
             <label for="edit-group-name">Nom du Sous-Groupe :</label>
             <input type="text" id="edit-group-name" name="editGroupName" required [(ngModel)]="editableWorkGroupData.name">
           </div>
-          
-
           <h4>Membres Actuels :</h4>
           @if (editableWorkGroupData.members.length > 0) {
             <ul class="current-members-in-modal-list">
@@ -185,11 +186,9 @@
           } @else {
             <p>Ce sous-groupe n'a actuellement aucun membre.</p>
           }
-
           <hr class="form-divider">
-
           <div class="add-person-input-section">
-            <h5>Ajouter une personne de la promo "{{ sourceGroupForBrief.name }}" par nom ou email :</h5>
+            <h5>Ajouter une personne de la promo "{{ data.sourceGroup.name }}" par nom ou email :</h5>
             <div class="form-group inline-form-group">
               <input type="text" id="add-person-input" name="addPersonInput"
                      placeholder="Nom ou email de la personne"
@@ -198,7 +197,6 @@
               <button type="button" class="button-add-person" (click)="addPersonFromInput()">Ajouter</button>
             </div>
           </div>
-
           <h5>Ou ajouter depuis la liste des personnes disponibles de la promo :</h5>
           <div class="available-people-for-edit-list">
             @for (person of getAvailablePeopleForEditingGroup(); track person.id) {
@@ -209,9 +207,7 @@
               <p>Toutes les personnes de la promo sont déjà dans ce sous-groupe.</p>
             }
           </div>
-
           @if (editWorkGroupError) { <p class="error-message">{{ editWorkGroupError }}</p> }
-
           <div class="buttons modal-buttons">
             <button type="button" class="button-secondary" (click)="closeEditWorkGroupModal()">Annuler</button>
             <button type="submit" class="button-primary">Enregistrer Modifications</button>
@@ -219,11 +215,12 @@
         </form>
       </div>
     </div>
-  } <!-- Fin modale modification sous-groupe -->
-
+  }
 
   <!-- MODALE DE CONFIRMATION DE SUPPRESSION D'UN SOUS-GROUPE DE TRAVAIL -->
+  <!-- workGroupToDelete est toujours géré localement -->
   @if (isDeleteWorkGroupConfirmModalOpen && workGroupToDelete) {
+    <!-- ... Contenu de la modale de suppression de sous-groupe ... (pas de changement ici) -->
     <div class="modal-overlay confirm-delete-modal-overlay" (click)="closeDeleteWorkGroupConfirmModal()">
       <div class="modal-content confirm-delete-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeDeleteWorkGroupConfirmModal()" aria-label="Fermer">×</button>
@@ -240,8 +237,8 @@
         </div>
       </div>
     </div>
-  } <!-- Fin modale suppression sous-groupe -->
+  }
 
 } @else {
-  <p class="loading-message">Chargement des détails du brief...</p>
+  <p class="loading-message">Chargement des détails du brief ou brief non trouvé...</p>
 }
