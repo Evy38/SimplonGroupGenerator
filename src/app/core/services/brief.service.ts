@@ -11,18 +11,34 @@ const INITIAL_BRIEFS_DATA: Brief[] = [
   {
     id: 'grpPoneys',
     name: 'Projet Portfolio',
+    title: 'Projet Portfolio', // Ajout de la propriété manquante
     description: 'Création d\'un site portfolio personnel.',
     imageUrl: 'assets/portfolio.png', // Vérifie que ce chemin est correct
-    sourceGroupId: 'grpPoneys' 
+    sourceGroupId: 'grpPoneys',
+    promoId: 'grpPoneys', // Ajout de la propriété manquante (à adapter si besoin)
+    creationDate: new Date() // Ajout de la propriété manquante
   },
   {
     id: 'grpMarmottes',
     name: 'API E-commerce',
+    title: 'API E-commerce', // Ajout de la propriété manquante
     description: 'Développement d\'une API pour un site marchand.',
     imageUrl: 'assets/taches.png', // Vérifie que ce chemin est correct
-    sourceGroupId: 'grpMarmottes' 
-  }
-  // Tu peux en ajouter d'autres si tu veux
+    sourceGroupId: 'grpMarmottes',
+    promoId: 'grpMarmottes', // Ajout de la propriété manquante (à adapter si besoin)
+    creationDate: new Date() // Ajout de la propriété manquante
+  },
+   {
+    id: 'brief-api-blog-poneys', // ID unique
+    name: 'API Blog ',
+    title: 'Développement API pour un Blog',
+    description: 'Les apprenants de la promo Poneys travailleront sur la création d\'une API RESTful pour une application de blog simple (articles, commentaires, utilisateurs).',
+    imageUrl: 'assets/blog.png', // Crée ou utilise une image appropriée
+    sourceGroupId: 'grpPoneys', // Lié à la promo "Poneys"
+    promoId: 'grpPoneys',       // Lié à la promo "Poneys"
+    creationDate: new Date(2024, 1, 1) // Exemple de date (1 Février 2024)
+    // assignedGroupId: null,
+  },
 ];
 
 @Injectable({

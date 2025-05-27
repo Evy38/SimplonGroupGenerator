@@ -2,23 +2,30 @@
 * {
   box-sizing: border-box;
 }
-body {
-  background-color: red;
-}
+
 
 .sidebar {
-  width: 80px; /* Largeur RÉDUITE pour mobile par défaut */
+  width: 100%; /* Prend toute la largeur de son parent <app-sidebar> */
   background-color: #ffffff;
   color: #333333;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  /* position: sticky; */
-  /* top: 0; */
+  height: 100vh; /* Ou 100% si le parent <app-sidebar> a une hauteur définie */
   border-right: 1px solid #e0e0e0;
   box-shadow: 2px 0 5px rgba(0,0,0,0.04);
-  z-index: 1010;
-  
+  /* z-index: 1010; */ /* Peut-être moins critique ici si le parent gère le z-index */
+
+  /* SUPPRIMER OU COMMENTER CES LIGNES : */
+  /* position: fixed; */
+  /* top: 0; */
+  /* left: 0; */
+  /* transform: translateX(-100%); */
+  /* transition: transform 0.3s ease-in-out; */
+}
+
+/* Style pour la sidebar quand elle est ouverte (classe ajoutée par [class.open]="isSidebarOpen") */
+.sidebar.open {
+  transform: translateX(0); /* La ramène à l'écran */
 }
 
 .sidebar-header {
@@ -26,18 +33,18 @@ body {
   text-align: center;
   border-bottom: 1px solid #f0f0f0;
   flex-shrink: 0;
-  height: 70px; /* Hauteur fixe pour le header */
+  height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative; /* Pour positionner le bouton 'X' à l'intérieur si besoin */
 }
 
 .app-logo {
-  max-width: 40px;
-  max-height: 40px;
+  max-width: 120px;
+  max-height: 120px;
   height: auto;
   display: block;
-  /* Par défaut, le logo est visible */
 }
 
 .sidebar-nav {
@@ -53,7 +60,7 @@ body {
 
 .sidebar-nav li a {
   display: flex;
-  flex-direction: column; /* Force les mots à aller en colonne */
+  flex-direction: column;
   align-items: flex-start;
   padding: 5px;
   text-decoration: none;
@@ -63,177 +70,206 @@ body {
   font-weight: 500;
   transition: background-color 0.2s ease, color 0.2s ease, border-left 0.2s ease;
   border-left: 4px solid transparent;
-  white-space: normal;  /* autorise le retour à la ligne */
-  width: 100%;          /* occupe toute la largeur définie par la sidebar */
+  white-space: normal;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .sidebar-nav li a:hover {
-  background-color: #f5f5f5; /* Fond léger au survol */
-  color: #123744; /* Couleur principale au survol */
-    font-weight: 700;
+  background-color: #f5f5f5;
+  color: #123744;
+  font-weight: 700;
 }
 
 .sidebar-nav li a.active-link {
-  background-color: #e9f3f5; /* Fond légèrement bleuté pour l'actif */
-  color: #123744; /* Couleur principale pour l'actif */
-  border-left-color: #123744; /* Indicateur de lien actif */
+  background-color: #e9f3f5;
+  color: #123744;
+  border-left-color: #123744;
 }
 
-
 .sidebar-footer {
-  padding: 10px 5px; 
+  padding: 10px 5px;
   border-top: 1px solid #e0e0e0;
-  display: flex; 
-  justify-content: space-around; 
-  align-items: center; 
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   flex-direction: column;
 }
 
 .sidebar-footer .buttons .button-text {
-  display: none; /* CACHÉ PAR DÉFAUT (Mobile & Tablette Portrait) */
-  margin-left: 8px; /* Espace entre l'icône et le texte quand il est visible */
-  font-size: 14px;  /* Taille du texte quand il est visible */
-  color: #555555;   /* Couleur du texte (à ajuster) */
-  white-space: nowrap; /* Empêche le texte du bouton de passer à la ligne */
+  display: none;
+  margin-left: 8px;
+  font-size: 14px;
+  color: #555555;
+  white-space: nowrap;
   font-weight: 600;
   font-family: 'Montserrat', sans-serif;
 }
 
-/* Cible les boutons avec la classe .buttons DANS .sidebar-footer */
 .sidebar-footer .buttons {
-  background-color: transparent; /* Ou la couleur de fond désirée */
-  border: none; /* Enlève la bordure par défaut des boutons */
-  padding: 5px; /* Petit padding interne pour l'icône */
+  background-color: transparent;
+  border: none;
+  padding: 5px;
   cursor: pointer;
-  display: flex; /* Pour bien centrer l'image à l'intérieur */
+  display: flex;
   align-items: center;
   justify-content: center;
- 
 }
 
 .sidebar-footer .buttons img {
-  max-width: 100%; 
-  height: auto;   
-  display: block; 
-   width: 35px;  
-   height: 35px; 
+  max-width: 100%;
+  height: auto;
+  display: block;
+  width: 35px;
+  height: 35px;
 }
 
 .sidebar-footer .buttons:hover {
   background-color: #f0f0f0;
 }
 
-
-
-.logout-button:hover {
+.logout-button:hover { /* S'assure que cela ne s'applique qu'au bouton logout si c'est une classe spécifique */
   background-color: #dea9a3;
-  border-color: #c0392b;
+  /* border-color: #c0392b; */ /* 'border' n'est pas défini, donc border-color n'aura pas d'effet */
+}
+
+/* Styles pour le bouton hamburger global (☰) - utilisé par ApprenantSidebarComponent */
+.sidebar-toggle-btn-global {
+  display: block;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1020; /* Doit être au-dessus de l'overlay mais peut être en dessous de la sidebar ouverte */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  line-height: 38px; /* Ajuster pour centrer le texte verticalement */
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Styles pour le bouton de fermeture (×) dans le header de la sidebar - utilisé par ApprenantSidebarComponent */
+.sidebar-header .toggle-btn-close { /* Cible plus spécifique */
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #555;
+  cursor: pointer;
+  padding: 0; /* Enlever le padding pour un meilleur contrôle */
+  line-height: 1; /* Pour un meilleur alignement vertical du '×' */
+  position: absolute; /* Positionner par rapport au sidebar-header */
+  top: 10px;        /* Ajuster selon le padding du header */
+  right: 10px;       /* Ajuster */
+  z-index: 1011; /* Au-dessus du reste du header de la sidebar */
+}
+
+/* Styles pour l'overlay - utilisé par ApprenantSidebarComponent */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Fond semi-transparent */
+  z-index: 1005; /* En dessous de la sidebar mais au-dessus du contenu principal */
 }
 
 
+/* === MEDIA QUERIES EXISTANTES (adaptées pour la nouvelle logique de positionnement) === */
+
 @media (max-width: 767.98px) {
-  .sidebar-header {
-     padding: 10px 0; /* Moins de padding si le logo est caché */
-     border-bottom: none; /* Peut-être pas de bordure si pas de logo */
+  .sidebar {
+    width: 160px;
+  }
+  /* Les styles pour .sidebar.open et transform s'appliqueront. */
+ .sidebar-header {
+  width: 120px;
   }
   .app-logo {
-    display: none; /* CACHE LE LOGO */
+     display: block; 
+     width: 100%;
   }
 
   .sidebar-nav {
-    padding-top: 10px; /* Commencer les liens plus haut si le header est plus petit/caché */
+    padding-top: 50px;
   }
 }
 
-
-@media (min-width: 768px) and (orientation: portrait) {
+@media (min-width: 768px) { /* Seuil pour desktop/tablette-paysage */
   .sidebar {
-    width: 180px; /* Ajuste cette largeur selon tes besoins */
+    position: sticky; /* Pour que la sidebar du formateur reste comme avant si elle utilise sticky */
+    transform: translateX(0); /* Assurer qu'elle est visible */
+    width: 240px; /* Largeur desktop par défaut */
   }
-.sidebar-header {
-    padding: 25px 20px; /* Padding normal */
-    height: auto; /* Ou une hauteur qui convient au logo plus grand */
-    border-bottom: 1px solid #f0f0f0; /* Rétablir la bordure */
-  }
+
+  /* Cacher les contrôles mobiles sur desktop */
+  /* .sidebar-toggle-btn-global,
+  .sidebar-header .toggle-btn-close,
+  .sidebar-overlay {
+    display: none !important; /* Important pour s'assurer qu'ils sont cachés */
+  
+
   .app-logo {
-    display: block; /* RÉAFFICHE LE LOGO */
-    max-width: 100px; /* Taille normale du logo */
-    max-height: none; /* Enlève la contrainte de hauteur si besoin */
+    display: block;
+    max-width: 100px; /* Ou 140px comme dans votre media query plus spécifique */
+    max-height: none;
   }
-.sidebar-nav {
-  flex-grow: 1;
-  overflow-y: auto;
-    padding-top: 20px; /* Padding normal */
+
+  .sidebar-header {
+    padding: 25px 20px;
+    height: auto;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .sidebar-nav {
+    overflow-y: auto;
+    padding-top: 20px;
   }
   .sidebar-nav li a {
-    padding: 16px 20px;
+    padding: 16px 20px; /* Ou 16px 25px */
     text-align: left;
-    font-size: 14px;
+    font-size: 15px;
     justify-content: flex-start;
   }
 
-  /* Si tu as un <span class="nav-text"> pour le texte des liens principaux */
-  .sidebar-nav li a .nav-text {
-    display: inline; /* Ou block */
-    /* margin-left: 10px; /* Si tu as une icône avant ce texte */
+  .sidebar-footer .buttons .button-text {
+    display: inline;
+    margin-left: 10px;
   }
-
   .sidebar-footer .buttons img {
-    width: 30px;
-    height: 30px;
+    width: 30px; /* Ou 32px */
+    height: 30px; /* Ou 32px */
   }
- 
+  .sidebar-footer {
+    padding: 20px;
+  }
+  .sidebar-footer .buttons {
+    justify-content: flex-start;
+    padding: 10px 15px;
+    width: 100%;
+  }
+  
 }
 
 
-/* --------------------------------------------------------------------------
-   TABLETTE - PAYSAGE ET PC (Ex: à partir de 992px ou 1024px)
-   - Sidebar encore plus large
-   - Logo encore plus grand
-   - Liens de navigation principaux plus aérés
-   - Texte des boutons du footer visible à côté des icônes
-   -------------------------------------------------------------------------- */
-@media (min-width: 765px) { /* Ajuste ce point de rupture si besoin (ex: 1024px) */
+@media (min-width: 765px) {
   .sidebar {
-    width: 240px; /* Ajuste cette largeur */
+    width: 240px;
   }
-
   .app-logo {
-    max-width: 140px; /* Ajuste cette taille */
+    max-width: 140px;
   }
-
-  /* Liens de navigation principaux */
   .sidebar-nav li a {
     padding: 16px 25px;
     font-size: 15px;
-    /* text-align: left; et justify-content: flex-start; sont hérités si la media query précédente s'est appliquée */
   }
-
-  /* Footer avec texte pour les boutons */
-  .sidebar-footer {
-    padding: 20px;
-    /* align-items: stretch; /* Si les boutons restent en colonne et doivent s'étirer */
-  }
-
-  .sidebar-footer .buttons {
-    justify-content: flex-start; /* Aligne icône et texte à gauche du bouton */
-    padding: 10px 15px;
-    width: 100%; /* Boutons prennent toute la largeur du footer (si en colonne) */
-    box-sizing: border-box;
-  }
-
   .sidebar-footer .buttons img {
-    width: 32px; /* Taille d'icône ajustée pour le texte */
+    width: 32px;
     height: 32px;
   }
-
-  .sidebar-footer .buttons .button-text {
-    display: inline; /* AFFICHE LE TEXTE DES BOUTONS DU FOOTER */
-    margin-left: 10px;
-    font-size: 14px;
-    color: #555555; /* Ajuste la couleur */
-    white-space: nowrap;
-    
-  }
+ 
 }

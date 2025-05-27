@@ -1,0 +1,60 @@
+<header class="page-header"> <!-- Style repris du formateur -->
+  <h1>Mes Briefs</h1>
+</header>
+
+<div class="brief-list-container apprenant-view"> <!-- Classe racine, ajout de 'apprenant-view' pour spécificité -->
+
+  @if (isLoading) {
+    <p class="loading-message">Chargement des briefs en cours...</p>
+  } @else if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  } @else {
+    @if (apprenantBriefs.length > 0) {
+      <!-- Utilisation de 'div' avec la classe 'brief-list' pour agir comme le conteneur de grille -->
+      <div class="brief-list">
+        @for (brief of apprenantBriefs; track brief.id) {
+          <!-- Chaque 'brief-item' est maintenant une 'div' pour mieux correspondre à la sémantique d'une carte -->
+          <div class="brief-item">
+            
+            @if (brief.imageUrl) {
+              <div class="brief-card-image">
+                <img [src]="brief.imageUrl" [alt]="'Image pour ' + brief.title">
+              </div>
+            } @else {
+              <div class="brief-card-image"> 
+                <img src="assets/G.png" [alt]="'Image par défaut pour ' + brief.title"> 
+              </div>
+            } 
+
+            <!-- Le header de la carte, contient le titre -->
+            <div class="brief-header">
+              <h3 class="brief-title">{{ brief.title }}</h3>
+            </div>
+
+            <!-- La description du brief -->
+            <p class="brief-description">{{ brief.description | slice:0:120 }}{{ brief.description.length > 120 ? '...' : '' }}</p>
+
+            <!-- Les méta-informations du brief (comme la date) -->
+            <div class="brief-meta">
+              @if (brief.creationDate) {
+                <span class="brief-date">Publié le : {{ brief.creationDate | date:'dd/MM/yyyy' }}</span>
+              }
+              <!-- Autres métadonnées possibles ici -->
+            </div>
+
+            <!-- Section optionnelle pour les actions sur la carte -->
+            <div class="brief-card-actions">
+              <a [routerLink]="['/apprenant/briefs', brief.id]" class="button-primary view-details-button" title="Voir les détails du brief">
+                Voir les détails
+              </a>
+              <!-- Tu pourrais ajouter d'autres boutons ici si nécessaire pour l'apprenant -->
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Message si aucun brief n'est trouvé, en utilisant la classe du formateur pour cohérence -->
+      <p class="no-briefs-message empty-list-message">Aucun brief n'est actuellement assigné à votre promotion.</p>
+    }
+  }
+</div>

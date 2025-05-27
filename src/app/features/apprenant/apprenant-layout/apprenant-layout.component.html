@@ -1,30 +1,25 @@
-<div class="apprenant-container">
-  <!-- Optionnel: Header spécifique à l'apprenant -->
-  <header class="apprenant-header">
-    <h1>Espace Apprenant</h1>
-    <!-- Peut-être un bouton de déconnexion ou un lien vers le profil -->
-  </header>
+<!-- src/app/features/apprenant/apprenant-layout/apprenant-layout.component.html -->
+<div class="apprenant-layout-container">
+    <!-- Bouton de bascule GÉRÉ PAR LE LAYOUT (comme pour le formateur) -->
+    @if (isMobileView) { <!-- S'affiche seulement en mode mobile -->
+      <button type="button" class="sidebar-toggle-button" (click)="toggleApprenantSidebar()">
+          {{ isLayoutSidebarOpen ? '✕' : '☰' }}
+      </button>
+    }
 
-  <!-- Optionnel: Sidebar spécifique à l'apprenant -->
-  <!--
-  <nav class="apprenant-sidebar">
-    <ul>
-      <li><a routerLink="dashboard">Tableau de bord</a></li>
-      <li><a routerLink="mes-groupes">Mes Groupes</a></li>
-      <li><a routerLink="mes-briefs-actifs">Mes Briefs Actifs</a></li>
-      <li><a routerLink="/profil">Mon Profil</a></li>
-    </ul>
-  </nav>
-  -->
+    <!-- La Sidebar de l'Apprenant reçoit son état du layout -->
+    <app-apprenant-sidebar
+      class="apprenant-sidebar-component"
+      [isOpen]="isLayoutSidebarOpen"
+      [class.open]="isLayoutSidebarOpen"> <!-- Appliquer aussi la classe .open ici pour le CSS du layout -->
+    </app-apprenant-sidebar>
 
-  <main class="apprenant-content">
-    <app-apprenant-layout></app-apprenant-layout> <!-- Les composants enfants s'afficheront ici -->
-  </main>
+    <!-- L'Overlay qui grise le fond -->
+    @if (isLayoutSidebarOpen && isMobileView) {
+      <div class="mobile-sidebar-overlay" (click)="toggleApprenantSidebar()"></div>
+    }
 
-  <!-- Optionnel: Footer spécifique à l'apprenant -->
-  <!--
-  <footer class="apprenant-footer">
-    <p>© 2024 Simplon Group Generator</p>
-  </footer>
-  -->
+    <main class="apprenant-main-content">
+        <router-outlet></router-outlet>
+    </main>
 </div>

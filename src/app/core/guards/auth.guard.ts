@@ -10,7 +10,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   console.log('AuthGuard: Vérification pour la route:', state.url); // Log de débogage
 
-  if (authService.isLoggedIn()) {
+  if (authService.isAuthenticated()) {
     const expectedRole = route.data?.['expectedRole'] as string | undefined; // Soyons explicite sur le type
     const currentUser = authService.currentUserValue;
 

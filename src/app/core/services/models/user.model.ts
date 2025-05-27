@@ -1,4 +1,7 @@
-export type UserRole = 'apprenant' | 'formateur' | 'admin'; // Ajout d'admin au cas où, sinon retire-le
+export enum UserRole {
+  FORMATEUR = 'formateur',
+  APPRENANT = 'apprenant',
+}
 
 export interface User {
   id: string;
@@ -6,7 +9,7 @@ export interface User {
   name: string;
   password?: string; // Le mot de passe ne devrait pas toujours être exposé, mais nécessaire pour la simulation
   role: UserRole;
-  // genre?: string;
-  // age?: number;
-  // etc.
+  promoId?: string;
+  age?: number;
+
 }

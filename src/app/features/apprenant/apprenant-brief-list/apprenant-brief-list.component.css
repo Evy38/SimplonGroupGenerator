@@ -1,0 +1,218 @@
+/* src/app/features/apprenant/apprenant-brief-list/apprenant-brief-list.component.css */
+
+/* ================================================ */
+/* STYLES GÉNÉRAUX DE LA PAGE (similaire au formateur) */
+/* ================================================ */
+.brief-list-container { /* Classe racine de ton HTML apprenant */
+  padding: 20px;
+  font-family: Arial, sans-serif; /* Tu peux changer pour 'Montserrat' si tu le préfères */
+}
+
+.brief-list-container h2 { /* Pour le titre "Mes Briefs" */
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Styles pour les messages de chargement, d'erreur, ou de liste vide */
+.loading-message,
+.error-message, /* Tu as déjà .error-message, on garde */
+.no-briefs-message { /* Tu as .no-briefs-message */
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1em;
+  color: #555;
+}
+.error-message { /* Styles spécifiques pour l'erreur */
+  color: red;
+  border: 1px solid red;
+  background-color: #ffe0e0;
+}
+
+
+/* ================================================ */
+/* GRILLE DES CARTES DE BRIEF (adaptée de la version formateur) */
+/* ================================================ */
+/* Ta structure HTML utilise <ul class="brief-list">.
+   On va styler cette ul pour qu'elle agisse comme le .brief-cards-container. */
+.brief-list { /* Anciennement ul.brief-list */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr; /* Une colonne sur mobile par défaut */
+  gap: 15px;
+  /* margin-bottom: 70px; */ /* Pas de FAB ici, donc pas besoin de cet espace */
+}
+
+/* ================================================ */
+/* CARTE DE BRIEF INDIVIDUELLE (adaptée de la version formateur) */
+/* ================================================ */
+/* Ta structure HTML utilise <li class="brief-item">.
+   On va styler ce li pour qu'il agisse comme le .brief-card. */
+.brief-item { /* Anciennement li.brief-item */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.6); /* Ombre plus subtile par défaut */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none; /* Si c'était un lien */
+  color: inherit;
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+}
+.brief-item:hover { /* Comportement au survol */
+  transform: translateY(-5px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  /* cursor: pointer; */ /* Seulement si toute la carte est cliquable */
+}
+
+/* Conteneur principal à l'intérieur de la carte/item */
+/* Tu n'as pas de .brief-card-main-content direct, on adapte.
+   Tes éléments sont directement dans .brief-item ou dans .brief-header et .brief-meta. */
+
+/* Image du brief (si tu décides d'en ajouter une) */
+/* Si tu ajoutes une div pour l'image : <div class="brief-card-image"><img></div> */
+.brief-card-image {
+  flex-shrink: 0;
+  width: 80px; /* Ou 100% si elle est au-dessus du contenu en mode desktop */
+  margin-right: 12px; /* Si à côté du texte */
+  display: flex;
+  align-items: center;
+}
+.brief-card-image img {
+  width: 100%;
+  height: auto; /* Ou height: 100%; object-fit: cover; si la div a une hauteur fixe */
+  display: block;
+  border-radius: 6px;
+}
+
+/* Contenu texte de la carte/item */
+/* On va styler .brief-header, .brief-title, .brief-description, .brief-meta */
+.brief-header { /* Tu as déjà cette classe */
+  /* display: flex; */ /* Si tu veux des éléments côte à côte dans le header */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+  padding: 15px 20px 10px 20px; /* Padding pour le header de la carte */
+}
+.brief-title { /* Tu as déjà cette classe */
+  font-size: 1.1em; /* Ajuste selon tes préférences */
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0; /* Espace en dessous du titre */
+  /* Pour l'ellipsis si besoin sur une ligne : */
+  /* white-space: nowrap; */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
+}
+.brief-description { /* Tu as déjà cette classe */
+  font-size: 0.9em;
+  color: #666;
+  line-height: 1.4;
+  padding: 0 20px 10px 20px; /* Padding pour la description */
+  margin: 0 0 10px 0;
+  /* Pour limiter à N lignes avec ellipsis : */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Nombre de lignes à afficher */
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.brief-meta { /* Tu as déjà cette classe */
+  font-size: 0.8em;
+  color: #888;
+  padding: 0 20px 15px 20px; /* Padding pour les méta-infos */
+  margin-top: auto; /* Pousse les méta-infos en bas si .brief-item est flex column et a un min-height */
+}
+
+
+/* Section des actions au bas de la carte/item (si tu en ajoutes) */
+.brief-card-actions {
+  padding: 10px 20px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end; /* Ou center, space-between */
+  gap: 10px;
+  background-color: #f9f9f9;
+}
+
+/* Style pour un bouton "Voir détails" (si tu utilises la classe button-primary) */
+.view-details-button.button-primary {
+  padding: 8px 16px; /* Taille de bouton plus petite pour les cartes */
+  font-size: 0.9em;
+  /* Les couleurs et autres styles viennent de .button-primary (que tu devrais définir si pas déjà fait) */
+}
+/* Si tu n'as pas .button-primary globalement, définis-le : */
+.button-primary {
+  background-color: #14343c; /* Ou ta couleur principale */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.button-primary:hover {
+  background-color: #0d2329; /* Couleur au survol */
+}
+
+
+/* ================================================ */
+/* MEDIA QUERIES (TABLETTES ET DESKTOP)             */
+/* ================================================ */
+@media (min-width: 768px) {
+
+  .brief-list { /* Anciennement ul.brief-list */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Grille responsive */
+    gap: 25px;
+  }
+
+  .brief-item { /* Anciennement li.brief-item */
+    flex-direction: column; /* Garde la direction en colonne pour la carte */
+    border-radius: 12px; /* Bords plus arrondis sur desktop */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12); /* Ombre légèrement différente pour desktop */
+  }
+
+  /* Si tu veux une image en haut de la carte sur desktop : */
+  /* .brief-card-image {
+    width: 100%;
+    height: 180px;
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+  .brief-card-image img {
+    border-radius: 12px 12px 0 0;
+    height: 100%;
+    object-fit: cover;
+  } */
+
+  /* Adapte le padding et les tailles de police pour desktop */
+  .brief-header {
+    padding: 20px 25px 10px 25px;
+  }
+  .brief-title {
+    font-size: 1.25em;
+    margin-bottom: 12px;
+  }
+  .brief-description {
+    font-size: 0.95em;
+    line-height: 1.5;
+    padding: 0 25px 15px 25px;
+    margin-bottom: 15px;
+    -webkit-line-clamp: 4; /* Un peu plus de lignes sur desktop */
+    line-clamp: 4;
+  }
+  .brief-meta {
+    font-size: 0.85em;
+    padding: 0 25px 20px 25px;
+  }
+  .brief-card-actions {
+    padding: 12px 25px;
+  }
+}
