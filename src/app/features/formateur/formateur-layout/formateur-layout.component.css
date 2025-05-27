@@ -34,6 +34,7 @@
   transform: translateX(-100%); /* Cachée par défaut à gauche */
   transition: transform 0.3s ease-in-out;
   z-index: 1015; 
+  width: 160px;
 }
 
 .formateur-sidebar.open { /* Quand la classe .open est ajoutée par Angular */

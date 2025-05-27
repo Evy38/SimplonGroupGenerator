@@ -1,0 +1,92 @@
+/* src/app/features/apprenant/apprenant-layout/apprenant-layout.component.css */
+.apprenant-layout-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* --- STYLES DE BASE (MOBILE FIRST) --- */
+.sidebar-toggle-button { /* Bouton géré par le layout */
+  display: block; /* Sera 'none' sur desktop */
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1030;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  line-height: 38px;
+  text-align: center;
+}
+
+.apprenant-sidebar-component { /* Cible <app-apprenant-sidebar class="apprenant-sidebar-component"> */
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 260px; /* Ou la largeur que tu veux pour la sidebar ouverte */
+  transform: translateX(-100%); /* Cachée par défaut à gauche */
+  transition: transform 0.3s ease-in-out;
+  z-index: 1020; /* Au-dessus de l'overlay */
+  /* Le background et autres styles internes viennent de ApprenantSidebarComponent lui-même */
+}
+
+.apprenant-sidebar-component.open { /* Quand [class.open]="isLayoutSidebarOpen" est true */
+  transform: translateX(0); /* La fait apparaître */
+}
+
+.apprenant-main-content {
+  flex-grow: 1;
+  padding: 20px;
+  padding-top: 70px; /* Espace pour le bouton burger fixe en haut en mode mobile */
+  background-color: #f4f7f6;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+  background-image: url("../../../../assets/BGSimplon.png");
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.mobile-sidebar-overlay {
+  /* display est géré par @if dans le template */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.55);
+  z-index: 1010; /* Entre le contenu et la sidebar */
+  cursor: pointer;
+}
+
+/* === MEDIA QUERIES POUR TABLETTE ET PLUS (768px et au-dessus) === */
+@media (min-width: 768px) {
+  .sidebar-toggle-button {
+    display: none; /* CACHÉ sur les écrans plus grands */
+  }
+
+  .apprenant-sidebar-component {
+    position: sticky; /* Comportement normal pour le flux de la page */
+    top: 0;
+    transform: translateX(0); /* Toujours visible et à sa place */
+    width: 260px; /* Largeur pour tablette/desktop */
+    /* z-index: auto; */ /* Moins critique ici */
+  }
+  /* .apprenant-sidebar-component.open n'a plus d'effet de transformation spécial ici */
+
+  .mobile-sidebar-overlay {
+    display: none !important;
+  }
+
+  .apprenant-main-content {
+    padding-top: 20px; /* Plus besoin de l'espace pour le burger */
+    /* Si la sidebar est sticky et a une largeur, le flexbox du container s'en charge.
+       Si la sidebar était 'fixed' sur desktop, il faudrait un margin-left ici.
+       margin-left: 260px; // Seulement si la sidebar est fixed sur desktop et ne pousse pas le contenu. */
+  }
+}

@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../core/services/auth.service'; // Vérifie bien ce chemin
+import { User } from '../../../core/services/models/user.model';     // Vérifie bien ce chemin
 
 @Component({
   selector: 'app-apprenant-dashboard',
@@ -8,6 +10,17 @@ import { CommonModule } from '@angular/common';
   templateUrl: './apprenant-dashboard.component.html',
   styleUrls: ['./apprenant-dashboard.component.css']
 })
-export class ApprenantDashboardComponent {
-  // Logique future pour le dashboard (ex: récupérer les infos de l'apprenant)
+
+export class ApprenantDashboardComponent implements OnInit {
+  currentUser: User | null = null;
+  welcomeMessage: string = "Bienvenue sur votre Dashboard !"; // Message par défaut
+
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.currentUser = this.authService.currentUserValue;
+    if (this.currentUser && this.currentUser.name) {
+      this.welcomeMessage = `Bienvenue, ${this.currentUser.name} !`;
+    }
+  }
 }

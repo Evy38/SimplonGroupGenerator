@@ -1,0 +1,159 @@
+.profile-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+.profile-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.profile-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 2px solid #007bff; /* Ligne bleue sous les titres de section */
+  padding-bottom: 5px;
+  display: inline-block;
+}
+.profile-section h4 {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.profile-container p {
+  line-height: 1.6;
+  color: #555;
+}
+.profile-container p strong {
+  color: #333;
+}
+
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+}
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+.btn-cancel {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ccc;
+}
+.btn-cancel:hover {
+  background-color: #e2e6ea;
+}
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.password-form .form-group {
+  margin-bottom: 15px;
+}
+.password-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #444;
+}
+.password-form input[type="password"],
+.password-form input[type="text"] {
+  width: calc(100% - 22px); /* Ajuster si le bouton show/hide est à côté */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.password-input-group {
+  display: flex;
+  align-items: center;
+}
+.password-input-group input {
+  flex-grow: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.btn-show-hide {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+
+.password-form .form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px; /* Espace entre les boutons */
+}
+
+.message {
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 4px;
+  text-align: center;
+}
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.profile-container ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+.profile-container li {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.formateur-info {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+  margin-left: 15px; /* Petit décalage pour l'alignement sous le nom de la promo */
+}
+
+.formateur-info strong {
+  color: #444;
+}

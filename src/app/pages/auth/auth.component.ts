@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Person } from '../../core/services/models/person.model'; // Assure-toi que ce chemin est correct
-// UserRole n'est pas directement utilisé ici car AuthService s'en charge
+import { UserRole } from '../../core/services/models/user.model';
 
 @Component({
   selector: 'app-auth',
@@ -57,7 +57,7 @@ export class AuthComponent implements OnInit {
 ngOnInit(): void {
   console.log('AuthComponent ngOnInit: Exécution de ngOnInit. URL actuelle:', this.router.url); // Log 1
 
-  if (this.authService.isLoggedIn()) {
+  if (this.authService.isAuthenticated()) {
     const currentUserRole = this.authService.currentUserValue?.role;
     console.log('AuthComponent ngOnInit: Utilisateur déjà connecté. Rôle:', currentUserRole); // Log 2
 
@@ -175,7 +175,7 @@ ngOnInit(): void {
       // role: 'apprenant' // Le rôle est déjà passé à registerUser
     };
 
-    const registrationResult = this.authService.registerUser(userDataForAuth, 'apprenant', personDetails);
+    const registrationResult = this.authService.registerUser(userDataForAuth, UserRole.APPRENANT);
 
     if (registrationResult.success) {
       this.registerSuccess = `Compte Apprenant pour ${this.registerApprenantData.name} créé avec succès ! Vous pouvez maintenant vous connecter.`;
@@ -209,7 +209,7 @@ ngOnInit(): void {
     // Si le formateur avait des champs spécifiques (comme organizationName DANS Person), on les passerait.
     // Ici, organizationName est dans registerFormateurData mais pas directement utilisé par Person.
 
-    const registrationResult = this.authService.registerUser(userDataForAuth, 'formateur');
+    const registrationResult = this.authService.registerUser(userDataForAuth, UserRole.FORMATEUR);
 
     if (registrationResult.success) {
       this.registerSuccess = `Compte Formateur pour ${this.registerFormateurData.name} créé avec succès ! Vous pouvez maintenant vous connecter.`;

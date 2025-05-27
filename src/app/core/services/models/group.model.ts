@@ -1,8 +1,12 @@
+// DANS: src/app/core/models/group.model.ts
 import { Person } from './person.model';
 
 export interface Group {
-  id: number | string;
-  name: string; // Nom donné au groupe lors de la création
+  id: string | number;
+  name: string;
   members: Person[];
   imageUrl?: string;
+  formateurName?: string; // Ajouté ici
+  // ou formateurId?: string;
+  generatedSubGroups?: Group[]; 
 }
