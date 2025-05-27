@@ -11,17 +11,27 @@ import { PromoService } from '../../../core/services/promo.service';
 
 // SIMULATION: Liste de TOUTES les personnes disponibles dans le système pour être ajoutées aux promos.
 // Idéalement, cela viendrait d'un PersonService ou d'une autre source de données.
-const ALL_SYSTEM_PEOPLE: Person[] = [
-  { id: 'p1', nom: 'Alice Lemaire', email: 'alice@mail.com', genre: 'feminin', aisanceFrancais: 4, ancienDWWM: true, niveauTechnique: 3, profil: 'alaise', age: 28 },
-  { id: 'p2', nom: 'Bob Martin', email: 'bob@mail.com', genre: 'masculin', aisanceFrancais: 3, ancienDWWM: false, niveauTechnique: 2, profil: 'reserve', age: 22 },
-  { id: 'p3', nom: 'Charlie Durand', email: 'charlie@mail.com', genre: 'nsp', aisanceFrancais: 4, ancienDWWM: true, niveauTechnique: 4, profil: 'timide', age: 30 },
-  { id: 'p4', nom: 'Diana Pires', email: 'diana@mail.com', genre: 'feminin', aisanceFrancais: 2, ancienDWWM: false, niveauTechnique: 1, profil: 'alaise', age: 25 },
-  { id: 'p5', nom: 'Émile Petit', email: 'emile@mail.com', genre: 'masculin', aisanceFrancais: 3, ancienDWWM: true, niveauTechnique: 2, profil: 'reserve', age: 27 },
-  { id: 'p6', nom: 'Fiona Guyot', email: 'fiona@mail.com', genre: 'feminin', aisanceFrancais: 4, ancienDWWM: false, niveauTechnique: 3, profil: 'alaise', age: 24 },
+const ALL_SYSTEM_PEOPLE:  Person[] = [ // <--- ICI SONT DÉFINIS TES APPRENANTS (PERSONNES)
+  { id: 'p1', nom: 'Alice Lemaire (Poney/Chaton)', email: 'alice@mail.com', genre: 'feminin', aisanceFrancais: 4, ancienDWWM: true, niveauTechnique: 3, profil: 'alaise', age: 28 },
+  { id: 'p2', nom: 'Bob Martin (Poney)', email: 'bob@mail.com', genre: 'masculin', aisanceFrancais: 3, ancienDWWM: false, niveauTechnique: 2, profil: 'reserve', age: 22 },
+  { id: 'p3', nom: 'Charlie Durand (Marmotte)', email: 'charlie@mail.com', genre: 'nsp', aisanceFrancais: 4, ancienDWWM: true, niveauTechnique: 4, profil: 'timide', age: 30 },
+  { id: 'p4', nom: 'Diana Pires (Marmotte/Chaton)', email: 'diana@mail.com', genre: 'feminin', aisanceFrancais: 2, ancienDWWM: false, niveauTechnique: 1, profil: 'alaise', age: 25 },
+  { id: 'p5', nom: 'Émile Petit (Marmotte)', email: 'emile@mail.com', genre: 'masculin', aisanceFrancais: 3, ancienDWWM: true, niveauTechnique: 2, profil: 'reserve', age: 27 },
+  { id: 'p6', nom: 'Fiona Guyot (Poney/Chaton)', email: 'fiona@mail.com', genre: 'feminin', aisanceFrancais: 4, ancienDWWM: false, niveauTechnique: 3, profil: 'alaise', age: 24 },
   { id: 'p7', nom: 'Gaspard Roux', email: 'gaspard@mail.com', genre: 'masculin', aisanceFrancais: 2, ancienDWWM: false, niveauTechnique: 1, profil: 'timide', age: 29 },
   { id: 'p8', nom: 'Hélène Claire', email: 'helene@mail.com', genre: 'feminin', aisanceFrancais: 3, ancienDWWM: true, niveauTechnique: 3, profil: 'reserve', age: 26 },
+  {
+    id: 'p-apprenant-test', // ID unique
+    nom: 'Apprenant Test User',
+    email: 'apprenant@test.com', // Email correspondant à votre mockUser dans AuthService
+    genre: 'nsp',
+    aisanceFrancais: 3,
+    ancienDWWM: false,
+    niveauTechnique: 2,
+    profil: 'reserve',
+    age: 25
+  }
 ];
-
 @Component({
   selector: 'app-promo-list', // Nouveau sélecteur
   standalone: true,

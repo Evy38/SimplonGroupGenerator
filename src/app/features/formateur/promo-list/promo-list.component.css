@@ -25,7 +25,7 @@
 .promo-card {
   background-color: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.8);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -448,7 +448,7 @@
   }
 
   .promo-card { /* ou .group-card */
-    border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.6);
   }
   .promo-card-image img { height: 180px; }
   .promo-card-content { padding: 20px; }

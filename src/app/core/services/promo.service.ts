@@ -28,29 +28,26 @@ const MOCK_PEOPLE_DATA: Person[] = [
   }
 ];
 
-// DANS: src/app/core/services/promo.service.ts
-
-// ... MOCK_PEOPLE_DATA ...
 
 const INITIAL_PROMOS_DATA: Group[] = [
   {
     id: 'grpPoneys',
     name: 'Les Poneys',
-    members: [MOCK_PEOPLE_DATA[0], /* ... autres ... */ MOCK_PEOPLE_DATA[8]],
+    members: [MOCK_PEOPLE_DATA[7], MOCK_PEOPLE_DATA[2], MOCK_PEOPLE_DATA[8], MOCK_PEOPLE_DATA[1], MOCK_PEOPLE_DATA[8]],
     imageUrl: 'assets/poneys.png',
     formateurName: 'Formateur Test' // Ou l'ID: 'user-formateur-id'
   },
   {
     id: 'grpMarmottes',
     name: 'Les Marmottes',
-    members: [/* ... */],
+    members: [MOCK_PEOPLE_DATA[7], MOCK_PEOPLE_DATA[1], MOCK_PEOPLE_DATA[8], MOCK_PEOPLE_DATA[5], MOCK_PEOPLE_DATA[8]],
     imageUrl: 'assets/marmottes.png',
     formateurName: 'Dr. Merlin Enchanteur' // Autre exemple de nom
   },
   {
     id: 'grpChatons',
     name: 'Les Chatons',
-    members: [/* ... */],
+    members: [MOCK_PEOPLE_DATA[0], MOCK_PEOPLE_DATA[3], MOCK_PEOPLE_DATA[8]],
     imageUrl: 'assets/chatons.png',
     formateurName: 'Professeur Minerva McGonagall'
   },

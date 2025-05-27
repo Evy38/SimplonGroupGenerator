@@ -9,36 +9,35 @@ import { Brief } from '../../core/services/models/brief.model';     // Ton modè
 // de promos qui existent dans tes INITIAL_PROMOS_DATA de PromoService.
 const INITIAL_BRIEFS_DATA: Brief[] = [
   {
-    id: 'grpPoneys',
+    id: 'brief-portfolio-poneys',
     name: 'Projet Portfolio',
-    title: 'Projet Portfolio', // Ajout de la propriété manquante
+    title: 'Projet Portfolio',
     description: 'Création d\'un site portfolio personnel.',
-    imageUrl: 'assets/portfolio.png', // Vérifie que ce chemin est correct
+    imageUrl: 'assets/portfolio.png', 
     sourceGroupId: 'grpPoneys',
-    promoId: 'grpPoneys', // Ajout de la propriété manquante (à adapter si besoin)
-    creationDate: new Date() // Ajout de la propriété manquante
+    promoId: 'grpPoneys', 
+    creationDate: new Date() 
   },
   {
-    id: 'grpMarmottes',
+    id: 'brief-ecommerce-marmottes',
     name: 'API E-commerce',
-    title: 'API E-commerce', // Ajout de la propriété manquante
+    title: 'API E-commerce', 
     description: 'Développement d\'une API pour un site marchand.',
-    imageUrl: 'assets/taches.png', // Vérifie que ce chemin est correct
-    sourceGroupId: 'grpMarmottes',
-    promoId: 'grpMarmottes', // Ajout de la propriété manquante (à adapter si besoin)
-    creationDate: new Date() // Ajout de la propriété manquante
+    imageUrl: 'assets/taches.png', 
+    sourceGroupId: 'grpPoneys',
+    promoId: 'grpPoneys', 
+    creationDate: new Date()
   },
    {
-    id: 'brief-api-blog-poneys', // ID unique
-    name: 'API Blog ',
-    title: 'Développement API pour un Blog',
-    description: 'Les apprenants de la promo Poneys travailleront sur la création d\'une API RESTful pour une application de blog simple (articles, commentaires, utilisateurs).',
-    imageUrl: 'assets/blog.png', // Crée ou utilise une image appropriée
-    sourceGroupId: 'grpPoneys', // Lié à la promo "Poneys"
-    promoId: 'grpPoneys',       // Lié à la promo "Poneys"
-    creationDate: new Date(2024, 1, 1) // Exemple de date (1 Février 2024)
-    // assignedGroupId: null,
-  },
+    id: 'brief-jeu-chatons',
+    name: 'Jeu 2D',
+    title: 'Création Jeu 2D',
+    description: 'Développement d\'un petit jeu en JavaScript.',
+    imageUrl: 'assets/jeu.png',
+ sourceGroupId: 'grpPoneys',
+    promoId: 'grpPoneys', 
+    creationDate: new Date('2024-03-10')
+  }
 ];
 
 @Injectable({
@@ -98,6 +97,21 @@ deleteBrief(briefId: string): void {
   } else {
     console.warn(`BriefService: Tentative de suppression d'un brief non trouvé (ID: ${briefId})`);
   }
+}
+getBriefsByPromoId(promoId: string): Observable<Brief[]> {
+  return this.briefs$.pipe(
+    map(briefs => {
+      console.log(`BriefService: Filtrage des briefs pour promoId: ${promoId}`);
+      const filteredBriefs = briefs.filter(brief => brief.promoId === promoId);
+      console.log(`BriefService: Briefs trouvés pour ${promoId}:`, filteredBriefs.length);
+      return filteredBriefs;
+    })
+  );
+}
+
+// Optionnel: une méthode pour récupérer tous les briefs (utile pour le formateur)
+getAllBriefs(): Observable<Brief[]> {
+  return this.briefs$;
 }
 
 }

@@ -156,9 +156,12 @@ body {
     height: auto; /* Ou une hauteur qui convient au logo plus grand */
     border-bottom: 1px solid #f0f0f0; /* Rétablir la bordure */
   }
+  .sidebar-header .app-logo img {
+    width: 200px;;
+  }
   .app-logo {
     display: block; /* RÉAFFICHE LE LOGO */
-    max-width: 100px; /* Taille normale du logo */
+    max-width: 200px; /* Taille normale du logo */
     max-height: none; /* Enlève la contrainte de hauteur si besoin */
   }
 .sidebar-nav {
@@ -189,10 +192,6 @@ body {
 
 /* --------------------------------------------------------------------------
    TABLETTE - PAYSAGE ET PC (Ex: à partir de 992px ou 1024px)
-   - Sidebar encore plus large
-   - Logo encore plus grand
-   - Liens de navigation principaux plus aérés
-   - Texte des boutons du footer visible à côté des icônes
    -------------------------------------------------------------------------- */
 @media (min-width: 765px) { /* Ajuste ce point de rupture si besoin (ex: 1024px) */
   .sidebar {
@@ -200,7 +199,7 @@ body {
   }
 
   .app-logo {
-    max-width: 140px; /* Ajuste cette taille */
+    max-width: 200px; /* Ajuste cette taille */
   }
 
   /* Liens de navigation principaux */
