@@ -179,7 +179,17 @@ export class BriefListComponent implements OnInit {
     } else {
       // LOGIQUE DE CRÉATION
       console.log('Appel de briefService.addBrief() avec:', briefPayloadForService);
-      this.briefService.addBrief(briefPayloadForService); // L'objet est maintenant conforme
+      // Utilise promoId comme targetPromoId et sourceGroupId comme sourcePromoId
+      this.briefService.addBrief(
+        {
+          name: briefPayloadForService.name,
+          title: briefPayloadForService.title,
+          description: briefPayloadForService.description,
+          imageUrl: briefPayloadForService.imageUrl
+        },
+        String(this.currentBriefData.promoId),
+        String(this.currentBriefData.sourceGroupId)
+      );
       this.formSuccess = `Brief '${briefPayloadForService.title}' créé ! Vérifiez la console (ou sera affiché via l'Observable).`;
     }
 

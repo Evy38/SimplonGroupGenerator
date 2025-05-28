@@ -1,11 +1,10 @@
 <!-- src/app/features/formateur/brief-detail/brief-detail.component.html -->
-<!-- MODIFICATION: Utiliser viewData$ avec le pipe async -->
 @if (viewData$ | async; as data) {
   <!-- SECTION HEADER: Affiche les détails du brief -->
   <header class="page-header brief-detail-header">
     <a routerLink="/formateur/briefs" class="back-to-list-link">← Retour à la liste des briefs</a>
-    <h1>{{ data.brief.name }}</h1>
-  
+    <h1>{{ data.brief.name }}</h1> <!-- Ou data.brief.title selon ce que tu préfères -->
+
     <p class="brief-detail-description">{{ data.brief.description }}</p>
     <p class="brief-promo-info">
       <em>Promo associée :
@@ -19,56 +18,96 @@
     </p>
   </header>
 
-  <!-- SECTION AFFICHAGE DES GROUPES DE TRAVAIL GÉNÉRÉS -->
+  <!-- SECTION AFFICHAGE ET MODIFICATION (DRAG & DROP) DES GROUPES DE TRAVAIL GÉNÉRÉS -->
   <section class="generated-work-groups-section">
-    <h2>Sous-Groupes de Travail Générés</h2>
-    @if (generatedWorkGroups.length > 0) { <!-- generatedWorkGroups est toujours géré localement -->
-      <div class="work-group-list-container">
+    <h2>Sous-Groupes de Travail Générés <span class="drag-drop-hint">(Glissez-déposez pour modifier)</span></h2>
+    @if (generatedWorkGroups.length > 0) {
+      <div class="work-group-list-container" cdkDropListGroup>
         @for (group of generatedWorkGroups; track group.id) {
-          <div class="work-group-card">
-            <div class="work-group-header" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
+          <div class="work-group-card"> <!-- La carte entière n'est plus la dropList principale, c'est l'UL -->
+
+            <div class="work-group-header">
               <h4 class="work-group-name">{{ group.name }}</h4>
               <div class="work-group-actions">
                 <button type="button" class="icon-button simple-edit-button" title="Modifier ce sous-groupe"
                         (click)="openEditWorkGroupModal(group, $event)">
                     <img src="assets/pen.png" alt="Modifier">
                 </button>
+               
                 <button type="button" class="icon-button simple-delete-button" title="Supprimer ce sous-groupe"
                         (click)="openDeleteWorkGroupConfirmModal(group, $event)">
                     <img src="assets/trash.png" alt="Supprimer">
                 </button>
               </div>
             </div>
-            <ul class="work-group-members-list" (click)="openWorkGroupMembersModal(group, $event)" title="Voir les membres de {{group.name}}">
-              @for (member of group.members; track member.id; let count = $count) {
-                @if ($index < 3) {
-                  <li class="member-name-item">{{ member.nom }}</li>
-                }
+
+            <!-- C'est l'UL qui est la zone de dépôt pour les membres de CE groupe -->
+            <ul class="work-group-members-list"
+                cdkDropList
+                [id]="'group-list-' + group.id" 
+                [cdkDropListData]="group.members"
+                (cdkDropListDropped)="dropMember($event, group.id.toString())">
+              @for (member of group.members; track member.id) {
+                <li class="member-name-item" cdkDrag [cdkDragData]="member">
+                  {{ member.nom }}
+                  <!-- Placeholder pendant le drag (optionnel, le CDK en fournit un par défaut) -->
+                  <!-- <div class="example-custom-placeholder" *cdkDragPlaceholder></div> -->
+                </li>
               }
-              @if (group.members.length > 3) {
-                <li class="member-name-item more-members">... et {{ group.members.length - 3 }} autre(s)</li>
+              @if (group.members.length === 0) {
+                <li class="no-members-in-card-drag-placeholder">Déposez des membres ici</li>
               }
             </ul>
-             @if (group.members.length === 0) {
-                <p class="no-members-in-card">Aucun membre</p>
-             }
-          </div>
+          </div> <!-- Fin .work-group-card -->
         }
-      </div>
+      </div> <!-- Fin .work-group-list-container -->
+
+      <!-- Zone pour les membres non assignés -->
+      @if(data?.sourceGroup?.members && unassignedMembersFromBrief) {
+        <div class="unassigned-members-pool-container">
+          <h4>Membres de la promo non assignés à un sous-groupe ({{ unassignedMembersFromBrief.length }})</h4>
+          <!-- La div externe est une carte, l'UL interne est la drop list -->
+          <div class="work-group-card unassigned-pool">
+            <ul class="work-group-members-list"
+                cdkDropList
+                id="unassigned-members-list" 
+                [cdkDropListData]="unassignedMembersFromBrief"
+                (cdkDropListDropped)="dropMember($event, null)">
+              @for(person of unassignedMembersFromBrief; track person.id) {
+                <li class="member-name-item" cdkDrag [cdkDragData]="person">{{ person.nom }}</li>
+              }
+              @if(unassignedMembersFromBrief.length === 0){
+                <li class="no-members-in-card-drag-placeholder">Aucun membre non assigné.</li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
     } @else {
       <p class="empty-list-message">Aucun sous-groupe de travail généré. Cliquez sur le dé pour commencer !</p>
     }
   </section>
 
+  <!-- SECTION POUR LE BOUTON DE SAUVEGARDE DES MODIFICATIONS DES GROUPES -->
+  <section class="save-work-groups-action-section">
+    @if (generatedWorkGroups.length > 0 || hasUnsavedWorkGroupChanges) {
+      <button type="button" class="button-primary save-groups-button"
+              (click)="saveGeneratedWorkGroups()"
+              [disabled]="!hasUnsavedWorkGroupChanges">
+        Enregistrer les modifications des sous-groupes
+      </button>
+      @if (hasUnsavedWorkGroupChanges) {
+        <p class="unsaved-changes-warning">Vous avez des modifications non enregistrées sur les sous-groupes.</p>
+      }
+    }
+  </section>
+
   <!-- BOUTON FLOTTANT "DÉ" pour la génération -->
-  <!-- S'assurer que data.brief et data.sourceGroup existent avant d'afficher le bouton ou de l'activer -->
   <button type="button" class="fab-button dice-fab" (click)="openGenerateGroupsModal()" title="Générer des sous-groupes de travail">
     <img src="assets/dés.png" alt="Générer groupes">
   </button>
 
-
   <!-- MODALE DE GÉNÉRATION DE SOUS-GROUPES (AVEC LE "DÉ") -->
-  <!-- data.brief et data.sourceGroup viennent de viewData$ | async -->
   @if (isGenerateGroupsModalOpen && data.brief && data.sourceGroup) {
     <div class="modal-overlay full-screen-modal-overlay" (click)="closeGenerateGroupsModal()">
       <div class="modal-content large-modal-content generate-groups-modal" (click)="$event.stopPropagation()">
@@ -77,13 +116,12 @@
           <h2>Générer des Sous-Groupes pour "{{ data.brief.name }}"</h2>
           <p>À partir de la promo : <strong>{{ data.sourceGroup.name }}</strong> ({{data.sourceGroup.members.length || 0}} personnes)</p>
         </div>
-        <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()"> <!-- onGenerateGroupsSubmit utilisera this.sourceGroupForBrief -->
+        <form class="modal-form" (ngSubmit)="onGenerateGroupsSubmit()">
           <div class="form-group">
             <label for="gen-people-per-group">Nombre de personnes par sous-groupe :</label>
             <input type="number" id="gen-people-per-group" name="genPeoplePerGroup"
                    [(ngModel)]="generationCriteria.peoplePerGroup" min="1" [max]="data.sourceGroup.members.length || 1" required>
           </div>
-          <!-- ... reste des critères de la modale de génération ... -->
           <h4 class="criteria-title">Critères de Mixité :</h4>
           <div class="form-group checkbox-group">
             <input type="checkbox" id="critere-dwwm" name="critereDwwm" [(ngModel)]="generationCriteria.mixAncienDWWM">
@@ -120,9 +158,7 @@
   }
 
   <!-- MODALE POUR AFFICHER LES MEMBRES D'UN SOUS-GROUPE DE TRAVAIL -->
-  <!-- selectedWorkGroupForMembers est toujours géré localement -->
   @if (isMembersModalOpen && selectedWorkGroupForMembers) {
-    <!-- ... Contenu de la modale des membres ... (pas de changement ici car elle dépend de selectedWorkGroupForMembers) -->
     <div class="modal-overlay members-modal-overlay" (click)="closeWorkGroupMembersModal()">
       <div class="modal-content members-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeWorkGroupMembersModal()" aria-label="Fermer">×</button>
@@ -159,9 +195,7 @@
   }
 
   <!-- MODALE DE MODIFICATION D'UN SOUS-GROUPE DE TRAVAIL -->
-  <!-- Utiliser data.sourceGroup pour getAvailablePeopleForEditingGroup -->
   @if (isEditWorkGroupModalOpen && selectedWorkGroupToEdit && editableWorkGroupData && data.sourceGroup) {
-    <!-- ... Contenu de la modale d'édition ... (pas de changement majeur ici, mais s'assurer que getAvailablePeopleForEditingGroup() a accès à data.sourceGroup si besoin) -->
      <div class="modal-overlay" (click)="closeEditWorkGroupModal()">
       <div class="modal-content large-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeEditWorkGroupModal()" aria-label="Fermer">×</button>
@@ -218,9 +252,7 @@
   }
 
   <!-- MODALE DE CONFIRMATION DE SUPPRESSION D'UN SOUS-GROUPE DE TRAVAIL -->
-  <!-- workGroupToDelete est toujours géré localement -->
   @if (isDeleteWorkGroupConfirmModalOpen && workGroupToDelete) {
-    <!-- ... Contenu de la modale de suppression de sous-groupe ... (pas de changement ici) -->
     <div class="modal-overlay confirm-delete-modal-overlay" (click)="closeDeleteWorkGroupConfirmModal()">
       <div class="modal-content confirm-delete-modal-content" (click)="$event.stopPropagation()">
         <button class="modal-close-button" (click)="closeDeleteWorkGroupConfirmModal()" aria-label="Fermer">×</button>

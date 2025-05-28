@@ -45,9 +45,10 @@ export const routes: Routes = [
   children: [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: ApprenantDashboardComponent },
-    { path: 'mes-briefs', component: ApprenantBriefListComponent }, // Si défini
-    { path: 'mes-groupes', component: ApprenantGroupeListComponent }, // Si défini
-    { path: 'profil', component: ProfileComponent } // <-- CETTE LIGNE EST IMPORTANTE
+    { path: 'mes-briefs', component: ApprenantBriefListComponent }, 
+    { path: 'mes-groupes', component: ApprenantGroupeListComponent }, 
+    { path: 'profil', component: ProfileComponent }, 
+    { path: 'mes-groupes', component: ApprenantGroupeListComponent }
   ]
 },
 
