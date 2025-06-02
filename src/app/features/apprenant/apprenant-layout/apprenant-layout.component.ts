@@ -14,15 +14,17 @@ import { ApprenantSidebarComponent } from '../components/apprenant-sidebar/appre
 export class ApprenantLayoutComponent implements OnInit, OnDestroy {
   isLayoutSidebarOpen: boolean = false;
   isMobileView: boolean = false;
-  private screenWidth: number;
+ screenWidth: number;
 
   constructor(private renderer: Renderer2) {
     this.screenWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
   }
 
-  ngOnInit(): void {
-    this.updateViewModes();
-  }
+ ngOnInit(): void {
+  this.screenWidth = window.innerWidth;
+  this.updateViewModes();
+}
+
 
   @HostListener('window:resize', ['$event'])
   onWindowResize(event?: Event): void {

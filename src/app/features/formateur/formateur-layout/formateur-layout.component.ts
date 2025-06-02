@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
     CommonModule    // Importer et déclarer le composant sidebar
   ],
   templateUrl: './formateur-layout.component.html',
-  styleUrl: './formateur-layout.component.css'
+  styleUrls: ['./formateur-layout.component.css']
 })
 
 

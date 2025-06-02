@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../core/services/auth.service'; // Vérifie bien ce chemin
-import { User } from '../../../core/services/models/user.model';     // Vérifie bien ce chemin
+import { AuthService } from '../../../core/services/auth.service'; 
+import { User } from '../../../core/services/models/user.model';    
 
 @Component({
   selector: 'app-apprenant-dashboard',

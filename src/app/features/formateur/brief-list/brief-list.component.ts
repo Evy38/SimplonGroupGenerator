@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { Brief } from '../../../core/services/models/brief.model'; // Ajusté pour pointer vers models
-import { Group } from '../../../core/services/models/group.model';   // Ajusté pour pointer vers models
+import { Group } from '../../../core/services/models/group.model'; // Ajusté pour pointer vers models
 
 import { BriefService } from '../../../core/services/brief.service';
 import { PromoService } from '../../../core/services/promo.service';
@@ -17,7 +17,7 @@ import { PromoService } from '../../../core/services/promo.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './brief-list.component.html',
-  styleUrls: ['./brief-list.component.css']
+  styleUrls: ['./brief-list.component.css'],
 })
 export class BriefListComponent implements OnInit {
   briefs$: Observable<Brief[]>;
@@ -45,7 +45,7 @@ export class BriefListComponent implements OnInit {
     sourceGroupId: null,
     promoId: null, // Initialiser
     creationDate: null, // Initialiser
-    assignedGroupId: null
+    assignedGroupId: null,
   };
 
   formError: string | null = null;
@@ -63,22 +63,32 @@ export class BriefListComponent implements OnInit {
     this.promos$ = this.promoService.promos$.pipe(
       tap((promos: Group[]) => {
         this.allPromos = promos;
-        console.log('Promos stockées localement dans BriefListComponent:', this.allPromos);
+        console.log(
+          'Promos stockées localement dans BriefListComponent:',
+          this.allPromos
+        );
       })
     );
   }
 
   ngOnInit(): void {
-    this.briefs$.subscribe(briefs => {
+    this.briefs$.subscribe((briefs) => {
       console.log('Briefs chargés depuis BriefService:', briefs);
       if (!briefs || briefs.length === 0) {
-          console.warn("Aucun brief chargé depuis BriefService. Vérifiez INITIAL_BRIEFS_DATA dans BriefService.");
+        console.warn(
+          'Aucun brief chargé depuis BriefService. Vérifiez INITIAL_BRIEFS_DATA dans BriefService.'
+        );
       }
     });
-    this.promos$.subscribe(promos => {
-      console.log('Promos (pour la sélection de sourceGroupId) chargées depuis PromoService:', promos);
+    this.promos$.subscribe((promos) => {
+      console.log(
+        'Promos (pour la sélection de sourceGroupId) chargées depuis PromoService:',
+        promos
+      );
       if (!promos || promos.length === 0) {
-          console.warn("Aucune promo chargée depuis PromoService. La sélection de la promo source dans la modale sera vide.");
+        console.warn(
+          'Aucune promo chargée depuis PromoService. La sélection de la promo source dans la modale sera vide.'
+        );
       }
     });
   }
@@ -95,7 +105,7 @@ export class BriefListComponent implements OnInit {
       sourceGroupId: null,
       promoId: null, // Réinitialiser
       creationDate: null, // Réinitialiser
-      assignedGroupId: null
+      assignedGroupId: null,
     };
     this.formError = null;
     this.formSuccess = null;
@@ -113,11 +123,14 @@ export class BriefListComponent implements OnInit {
       sourceGroupId: brief.sourceGroupId,
       promoId: brief.promoId, // Pré-remplir
       creationDate: brief.creationDate, // Pré-remplir
-      assignedGroupId: brief.assignedGroupId || null
+      assignedGroupId: brief.assignedGroupId || null,
     };
     this.formError = null;
     this.formSuccess = null;
-    console.log("Ouverture modale pour édition, currentBriefData:", this.currentBriefData);
+    console.log(
+      'Ouverture modale pour édition, currentBriefData:',
+      this.currentBriefData
+    );
   }
 
   closeCreateBriefModal(): void {
@@ -130,8 +143,11 @@ export class BriefListComponent implements OnInit {
     this.formSuccess = null;
 
     // --- AJOUT/MODIFICATION : Utiliser currentBriefData.title ---
-    if (!this.currentBriefData.title.trim() || !this.currentBriefData.description.trim()) {
-      this.formError = "Le titre et la description du brief sont obligatoires.";
+    if (
+      !this.currentBriefData.title.trim() ||
+      !this.currentBriefData.description.trim()
+    ) {
+      this.formError = 'Le titre et la description du brief sont obligatoires.';
       return;
     }
 
@@ -139,13 +155,15 @@ export class BriefListComponent implements OnInit {
     // On suppose que sourceGroupId EST le promoId pour un nouveau brief.
     // Tu devras t'assurer que `this.currentBriefData.sourceGroupId` est bien l'ID de la promo
     // sélectionnée dans ton formulaire.
-    if (this.currentBriefData.sourceGroupId === null || this.currentBriefData.sourceGroupId === undefined) {
-      this.formError = "Veuillez assigner ce brief à une promo source.";
+    if (
+      this.currentBriefData.sourceGroupId === null ||
+      this.currentBriefData.sourceGroupId === undefined
+    ) {
+      this.formError = 'Veuillez assigner ce brief à une promo source.';
       return;
     }
     // Pour la clarté, on assigne explicitement promoId
     this.currentBriefData.promoId = this.currentBriefData.sourceGroupId;
-
 
     // --- MODIFICATION : S'assurer que title, promoId, creationDate sont dans le payload ---
     // `name` dans ton modèle Brief est peut-être redondant si tu as `title`.
@@ -161,7 +179,7 @@ export class BriefListComponent implements OnInit {
       creationDate: new Date(), // Toujours une nouvelle date à la création/sauvegarde pour cet exemple
       imageUrl: this.currentBriefData.imageUrl || undefined,
       sourceGroupId: this.currentBriefData.sourceGroupId,
-      assignedGroupId: this.currentBriefData.assignedGroupId // Ceci est optionnel dans ton modèle Brief
+      assignedGroupId: this.currentBriefData.assignedGroupId, // Ceci est optionnel dans ton modèle Brief
     };
 
     if (this.isEditMode && this.currentBriefData.id) {
@@ -171,21 +189,27 @@ export class BriefListComponent implements OnInit {
       const briefToUpdate: Brief = {
         ...briefPayloadForService, // Contient déjà name, title, desc, promoId, imageUrl, sourceGroupId, assignedGroupId
         id: this.currentBriefData.id,
-        creationDate: this.currentBriefData.creationDate || new Date() // Conserve la date de création existante ou une nouvelle si absente
+        creationDate: this.currentBriefData.creationDate || new Date(), // Conserve la date de création existante ou une nouvelle si absente
       };
-      console.log('SIMULATION: Prêt à appeler briefService.updateBrief() avec:', briefToUpdate);
-      // À FAIRE PROCHAINEMENT: this.briefService.updateBrief(briefToUpdate); // Tu n'as pas encore updateBrief
+      console.log(
+        'SIMULATION: Prêt à appeler briefService.updateBrief() avec:',
+        briefToUpdate
+      );
+      this.briefService.updateBrief(briefToUpdate);
       this.formSuccess = `Brief '${briefToUpdate.title}' (simulation) modifié ! Vérifiez la console.`;
     } else {
       // LOGIQUE DE CRÉATION
-      console.log('Appel de briefService.addBrief() avec:', briefPayloadForService);
+      console.log(
+        'Appel de briefService.addBrief() avec:',
+        briefPayloadForService
+      );
       // Utilise promoId comme targetPromoId et sourceGroupId comme sourcePromoId
       this.briefService.addBrief(
         {
           name: briefPayloadForService.name,
           title: briefPayloadForService.title,
           description: briefPayloadForService.description,
-          imageUrl: briefPayloadForService.imageUrl
+          imageUrl: briefPayloadForService.imageUrl,
         },
         String(this.currentBriefData.promoId),
         String(this.currentBriefData.sourceGroupId)
@@ -198,7 +222,11 @@ export class BriefListComponent implements OnInit {
     }, 2000);
   }
 
-  openConfirmDeleteModal(briefId: string, briefName: string, event: MouseEvent): void {
+  openConfirmDeleteModal(
+    briefId: string,
+    briefName: string,
+    event: MouseEvent
+  ): void {
     event.stopPropagation();
     this.briefToDeleteId = briefId;
     this.briefNameToDelete = briefName;
@@ -213,7 +241,10 @@ export class BriefListComponent implements OnInit {
 
   confirmDeleteBrief(): void {
     if (this.briefToDeleteId) {
-      console.log('SIMULATION: Prêt à appeler briefService.deleteBrief() avec ID:', this.briefToDeleteId);
+      console.log(
+        'SIMULATION: Prêt à appeler briefService.deleteBrief() avec ID:',
+        this.briefToDeleteId
+      );
       this.briefService.deleteBrief(this.briefToDeleteId);
       this.formSuccess = `Brief (ID: ${this.briefToDeleteId}) (simulation) supprimé ! Vérifiez la console.`;
       this.closeConfirmDeleteModal();

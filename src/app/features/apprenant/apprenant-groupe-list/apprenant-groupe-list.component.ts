@@ -8,8 +8,6 @@ import { map } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { BriefService } from '../../../core/services/brief.service';
 import { User } from '../../../core/services/models/user.model';
-import { Brief } from '../../../core/services/models/brief.model';
-import { Group } from '../../../core/services/models/group.model'; // Assure-toi que ce chemin est correct et Group est exporté
 import { Person } from '../../../core/services/models/person.model';
 
 // Interface pour structurer les données à afficher dans ce composant
