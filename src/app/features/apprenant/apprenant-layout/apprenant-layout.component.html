@@ -1,0 +1,25 @@
+<!-- src/app/features/apprenant/apprenant-layout/apprenant-layout.component.html -->
+<div class="apprenant-layout-container">
+    <!-- Bouton de bascule GÉRÉ PAR LE LAYOUT (comme pour le formateur) -->
+    @if (isMobileView) { <!-- S'affiche seulement en mode mobile -->
+      <button type="button" class="sidebar-toggle-button" (click)="toggleApprenantSidebar()">
+          {{ isLayoutSidebarOpen ? '✕' : '☰' }}
+      </button>
+    }
+
+    <!-- La Sidebar de l'Apprenant reçoit son état du layout -->
+    <app-apprenant-sidebar
+      class="apprenant-sidebar-component"
+      [isOpen]="isLayoutSidebarOpen"
+      [class.open]="isLayoutSidebarOpen"> <!-- Appliquer aussi la classe .open ici pour le CSS du layout -->
+    </app-apprenant-sidebar>
+
+    <!-- L'Overlay qui grise le fond -->
+    @if (isLayoutSidebarOpen && isMobileView) {
+      <div class="mobile-sidebar-overlay" (click)="toggleApprenantSidebar()"></div>
+    }
+
+    <main class="apprenant-main-content">
+        <router-outlet></router-outlet>
+    </main>
+</div>

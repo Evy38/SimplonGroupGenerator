@@ -1,0 +1,342 @@
+/* src/app/features/formateur/brief-detail/brief-detail.component.css */
+
+/* Styles existants pour la page (conservés) */
+.brief-detail-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.brief-detail-header h1 {
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+.back-to-list-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #3498db;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+.back-to-list-link:hover {
+  text-decoration: underline;
+}
+/* .brief-detail-image { ... } <- Cette classe ne semble pas utilisée dans le HTML actuel pour le brief lui-même */
+.brief-detail-description {
+  font-size: 1.1em;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 15px;
+  white-space: pre-wrap;
+}
+.brief-promo-info {
+  font-size: 0.95em;
+  color: #777;
+  margin-top: 10px;
+}
+
+/* Section des groupes générés */
+.generated-work-groups-section {
+  margin-top: 40px;
+}
+.generated-work-groups-section h2 {
+  font-size: 1.6em;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.drag-drop-hint { /* Style pour le hint à côté du titre h2 */
+  font-size: 0.7em;
+  font-style: italic;
+  color: #666;
+  font-weight: normal;
+  margin-left: 5px;
+}
+
+.work-group-list-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Une colonne sur mobile par défaut */
+  gap: 20px;
+  /* margin-bottom: 80px; <- Déplacé vers la section de sauvegarde pour qu'elle soit toujours en bas */
+}
+
+.work-group-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.10); /* Ombre plus douce pour les cartes */
+  padding: 0; /* Le padding sera dans .work-group-header et .work-group-members-list */
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+/* Effet de survol UNIQUEMENT si la carte n'est pas en cours de drag ou placeholder */
+.work-group-card:hover:not(.cdk-drag-preview):not(.cdk-drag-placeholder) {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+}
+
+.work-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 15px;
+  /* cursor: pointer; <- Retiré car maintenant les actions sont sur des boutons spécifiques */
+}
+.work-group-name {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+.work-group-actions {
+  display: flex;
+  gap: 8px;
+}
+.work-group-actions .icon-button {
+  background: none; border: none; cursor: pointer; padding: 5px;
+  border-radius: 50%; width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background-color 0.2s ease;
+}
+.work-group-actions .icon-button img { width: 18px; height: 18px; display: block; }
+.work-group-actions .icon-button:hover { background-color: #f0f0f0; }
+
+
+/* Styles pour la liste des membres (cdkDropList) */
+.work-group-members-list {
+  list-style: none;
+  padding: 10px 15px 15px 15px;
+  margin: 0;
+  font-size: 0.9em;
+  color: #555;
+  flex-grow: 1; /* Pour que la carte s'étende si d'autres sont plus hautes */
+  min-height: 60px; /* Hauteur minimale pour la visibilité de la zone de drop */
+  border: 2px dashed transparent; /* Bordure discrète, deviendra visible au survol du drag */
+  border-radius: 0 0 8px 8px; /* Coins arrondis en bas si c'est le dernier élément de la carte */
+  transition: background-color 0.2s ease, border-color 0.2s ease; /* Transition pour le survol */
+}
+
+/* Indication visuelle quand on drague un élément AU-DESSUS d'une liste de dépôt */
+.cdk-drop-list-dragging .work-group-members-list:not(.cdk-drag-placeholder-receiving) {
+   background-color: #e9f5ff; /* Fond bleu très clair (optionnel) */
+   border-color: #a0cff2; /* Bordure bleue (optionnel) */
+}
+/* Indication visuelle quand la liste est sur le point de RECEVOIR un élément */
+.work-group-members-list.cdk-drop-list-receiving {
+   background-color: #d4edda; /* Fond vert clair */
+   border-color: #73c686; /* Bordure verte */
+}
+
+
+.work-group-members-list .member-name-item {
+  padding: 6px 8px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  cursor: grab; /* Indique que l'élément est déplaçable */
+  transition: background-color 0.1s ease;
+}
+.work-group-members-list .member-name-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.work-group-members-list .member-name-item:hover:not(.cdk-drag-preview) {
+  background-color: #f0f0f0; /* Léger changement au survol simple */
+}
+
+.no-members-in-card-drag-placeholder { /* Pour le message "Déposez des membres ici" */
+  padding: 15px;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  border: 1px dashed #ddd;
+  border-radius: 4px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style-type: none; /* Assurer que ce n'est pas une puce de liste */
+  margin:0; /* Annuler la marge par défaut des <li> */
+  background-color: #fff; /* Fond pour se démarquer de la liste parente si elle a un fond au hover */
+}
+
+/* Styles pour la zone des membres non assignés */
+.unassigned-members-pool-container {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+.unassigned-members-pool-container h4 {
+  font-size: 1.2em;
+  color: #555;
+  margin-bottom: 10px;
+}
+/* La carte pour les non-assignés utilise .work-group-card et .unassigned-pool */
+.work-group-card.unassigned-pool {
+  background-color: #f8f9fa; /* Fond légèrement différent */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.work-group-card.unassigned-pool .work-group-members-list { /* C'est la cdkDropList */
+  border: 2px dashed #adb5bd; /* Bordure en pointillés plus visible */
+  background-color: #f1f3f5; /* Fond pour la zone de drop elle-même */
+  min-height: 80px;
+}
+.work-group-card.unassigned-pool .work-group-members-list.cdk-drop-list-receiving {
+   background-color: #d1e7dd; /* Vert plus clair pour la zone non assignée */
+   border-color: #6ba87a;
+}
+
+
+/* Section du bouton de sauvegarde */
+.save-work-groups-action-section {
+  margin-top: 30px;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  margin-bottom: 80px; /* Espace pour le FAB en bas */
+}
+.save-groups-button { /* Utilise .button-primary du formateur */
+  padding: 12px 25px;
+  font-size: 1.05em;
+}
+.unsaved-changes-warning {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #e67e22;
+}
+
+/* Styles pour le Drag & Drop CDK (génériques) */
+.cdk-drop-list-dragging .cdk-drag { /* Style de l'item pendant qu'on drague DANS sa liste d'origine */
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+.cdk-drag-placeholder { /* Style du placeholder où l'item sera déposé */
+  opacity: 0.4;
+  background: #e9ecef; /* Fond gris clair pour le placeholder */
+  border: 2px dashed #b0bec5; /* Bordure en pointillés pour le placeholder */
+  min-height: 38px; /* Correspond à la hauteur d'un .member-name-item */
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  border-radius: 4px;
+  margin: 5px 0; /* Correspondre aux marges des .member-name-item */
+  box-sizing: border-box;
+  display: block;
+}
+.cdk-drag-preview { /* Style de l'élément "fantôme" qu'on déplace avec la souris */
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12); /* Ombre portée standard Material */
+  background: #ffffff;
+  padding: 6px 8px; /* padding de .member-name-item */
+  font-size: 0.9em; /* font-size de .member-name-item */
+  color: #333; /* Couleur du texte de l'item */
+}
+
+
+/* Styles FAB et Modales (conservés tels que fournis) */
+.fab-button.dice-fab { position: fixed; bottom: 20px; right: 20px; width: auto; height: auto; border: none; cursor: pointer; z-index: 900; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease-out; background-color: transparent; }
+.fab-button.dice-fab img { width: 50px; height: 50px; box-shadow: 3px 3px 8px rgba(0,0,0,0.8); }
+.fab-button.dice-fab:hover { transform: scale(1.05) rotate(180deg); width: 90px; height: 90px; }
+.fab-button.dice-fab:active { transform: scale(0.95) rotate(0deg); }
+
+.modal-overlay, .full-screen-modal-overlay, .members-modal-overlay, .confirm-delete-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.65); display: flex; justify-content: center; align-items: center; padding: 15px; z-index: 1050; box-sizing: border-box; }
+.modal-content { background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: 100%; max-height: 90vh; overflow-y: auto; position: relative; padding: 20px; display: flex; flex-direction: column; }
+.modal-close-button { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; color: #aaa; cursor: pointer; line-height: 1; padding: 5px; }
+.modal-close-button:hover { color: #555; }
+.modal-header { text-align: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; }
+.modal-header h2 { font-size: 20px; color: #333; margin: 0 0 5px 0; }
+.modal-header p { font-size: 14px; color: #666; margin: 0; }
+.modal-form .form-group { margin-bottom: 15px; }
+.modal-form label { display: block; font-weight: 500; margin-bottom: 6px; font-size: 14px; }
+.modal-form input[type="number"], .modal-form input[type="text"], .modal-form input[type="url"], .modal-form select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+.modal-form .form-group.checkbox-group { display: flex; align-items: center; margin-bottom: 10px; }
+.modal-form .form-group.checkbox-group input[type="checkbox"] { width: auto; margin-right: 8px; margin-top: 0; }
+.modal-form .form-group.checkbox-group label { margin-bottom: 0; font-weight: normal; }
+.modal-buttons, .modal-footer.buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
+.button-primary, .button-secondary, .button-danger, .button-add-person { padding: 10px 20px; font-size: 15px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; transition: background-color 0.2s ease; }
+.button-primary { background-color: #14343c; color: white; }
+.button-primary:hover { background-color: #0d2329; }
+.button-secondary { background-color: #f0f0f0; color: #555; border:1px solid #ddd; }
+.button-secondary:hover { background-color: #e0e0e0; }
+.button-danger { background-color: #ca1c42; color: white; }
+.button-danger:hover { background-color: #a51735; }
+.modal-form .error-message { color: #c0392b; background-color: #fdecea; border: 1px solid #e74c3c60; padding: 8px 12px; border-radius: 4px; font-size: 0.9em; margin-top: 15px; text-align: left; }
+.generate-groups-modal .criteria-title { font-size: 1em; font-weight: 600; margin-top: 25px; margin-bottom: 10px; padding-top: 15px; border-top: 1px solid #eee; }
+.members-modal-content { max-width: 480px; }
+.members-modal-content .modal-body.members-list-body { max-height: 60vh; overflow-y: auto; padding: 0 5px; }
+.members-modal-content .members-ul { list-style:none; padding:0; margin:0; }
+.members-modal-content .member-item { padding:10px 5px; border-bottom:1px solid #f0f0f0; font-size:15px; }
+.members-modal-content .member-item:last-child { border-bottom:none; }
+.members-modal-content .member-name { font-weight:500; color:#333; display: block; margin-bottom: 4px; }
+.members-modal-content .member-details { font-size:0.85em; color:#666; }
+.members-modal-content .member-detail { display: block; margin-left: 10px; margin-bottom: 2px; }
+.members-modal-content .member-detail:before { content: "• "; margin-right: 4px; }
+.large-modal-content .modal-form h4 { font-size: 1em; font-weight: 600; margin-bottom: 10px; margin-top: 20px; }
+.large-modal-content .current-members-in-modal-list { list-style:none; padding:0; margin-bottom:15px; max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px; border-radius: 4px; }
+.large-modal-content .current-members-in-modal-list li { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background-color:#f9f9f9; border-bottom:1px solid #eee; border-radius:4px; margin-bottom:5px; font-size:0.9em; }
+.large-modal-content .current-members-in-modal-list li:last-child { border-bottom: none; }
+.large-modal-content .current-members-in-modal-list em { font-size: 0.9em; color: #777; }
+.large-modal-content .remove-member-button { background:none; border:none; color:#e74c3c; font-size:1.2em; cursor:pointer; padding:2px 5px; line-height:1; border-radius: 3px; }
+.large-modal-content .remove-member-button:hover { color:#c0392b; background-color: #fdecea; }
+.modal-form .form-divider { border:none; border-top:1px dashed #ccc; margin:20px 0; }
+.large-modal-content .add-person-input-section h5, .large-modal-content .modal-form > h5 { font-size: 0.9em; font-weight: 500; margin-top: 20px; margin-bottom: 10px; }
+.large-modal-content .inline-form-group { display: flex; gap: 10px; align-items: center; }
+.large-modal-content .inline-form-group input[type="text"] { flex-grow: 1; }
+.button-add-person:hover { background-color: #4cae4c; } /* Correction: addBrief utilisait une couleur verte */
+.large-modal-content .available-people-for-edit-list { max-height: 150px; overflow-y: auto; border: 1px solid #eee; padding: 5px; border-radius: 4px; margin-bottom: 20px; }
+.large-modal-content .person-item-to-add { padding:8px 10px; cursor:pointer; border-radius:4px; margin-bottom:4px; border:1px solid transparent; transition: background-color 0.2s ease, border-color 0.2s ease; font-size:0.9em; }
+.large-modal-content .person-item-to-add:hover { background-color:#f0f8ff; border-color: #cce4ff; }
+.confirm-delete-modal-content { max-width: 400px; text-align:center; padding: 20px 25px; }
+.confirm-delete-modal-content .modal-header h2 { color:#c0392b; font-size:18px; }
+.confirm-delete-modal-content .modal-body p { margin-bottom:8px; font-size:15px; }
+.confirm-delete-modal-content .warning-text { color:#ca1c42; font-weight:500; margin-top:10px; font-size:0.9em; }
+.confirm-delete-modal-content .modal-footer.confirm-delete-buttons { justify-content:space-around; border-top: none; padding-top: 10px; }
+.large-modal-content { max-width: 500px; }
+
+
+/* MEDIA QUERIES (TABLETTES ET DESKTOP) */
+@media (min-width: 768px) {
+  .page-header h1 { font-size: 28px; }
+  .work-group-list-container { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+  .fab-button.dice-fab img { width: 80px; height: 80px; }
+  .modal-overlay { padding: 30px; }
+  .modal-content { padding: 30px 40px; border-radius: 12px; }
+  .large-modal-content.brief-modal-content, .modal-content.large-modal-content { max-width: 750px; padding: 35px 45px; }
+  .confirm-delete-modal-content { max-width: 450px; padding: 30px 40px; }
+  .modal-close-button { top: 15px; right: 20px; font-size: 28px; }
+  .modal-header h2 { font-size: 24px; }
+  .confirm-delete-modal-content .modal-header h2 { font-size: 1.3em; }
+  .modal-form input[type="number"], .modal-form input[type="text"], .modal-form input[type="url"], .modal-form select { padding: 12px 15px; font-size: 16px;}
+  .button-primary, .button-secondary, .button-danger, .button-add-person { font-size: 1em; padding: 12px 25px; }
+  .confirm-delete-modal-content .modal-body p { font-size: 1.05em; }
+  .confirm-delete-modal-content .warning-text { font-size: 0.95em; }
+
+  /* Styles spécifiques pour .work-group-card en desktop (layout "carré") */
+  .work-group-card {
+    /* flex-direction: column; <- Déjà le cas par défaut */
+    /* padding: 0; <- Déjà le cas */
+    border-radius: 12px; /* Style formateur */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12); /* Style formateur */
+  }
+  .work-group-card:hover:not(.cdk-drag-preview):not(.cdk-drag-placeholder) { /* Style formateur */
+    transform: translateY(-5px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+  .work-group-header { padding: 15px 20px; } /* Padding standard pour le header de la carte carrée */
+  .work-group-name { font-size: 1.2em; } /* Titre de groupe plus grand */
+  .work-group-members-list { /* La cdkDropList */
+    padding: 15px 20px 20px 20px; /* Plus de padding */
+    min-height: 100px; /* Plus de hauteur pour la zone de drop */
+    border-radius: 0 0 12px 12px; /* Coins arrondis en bas */
+  }
+  .work-group-members-list .member-name-item {
+    padding: 8px 10px; /* Plus d'espace pour chaque item */
+    font-size: 0.95em;
+  }
+  .unassigned-members-pool-container h4 { font-size: 1.3em; }
+  .work-group-card.unassigned-pool .work-group-members-list { min-height: 120px; }
+  .save-groups-button { font-size: 1.1em; padding: 12px 30px; }
+}

@@ -1,0 +1,52 @@
+<!-- src/app/features/apprenant/apprenant-mes-groupes/apprenant-mes-groupes.component.html -->
+<header class="page-header"> <!-- Style similaire à tes autres pages apprenant -->
+  <h1>Mes Groupes de Travail</h1>
+</header>
+
+<div class="apprenant-group-list-container">
+  @if (isLoading) {
+    <p class="loading-message">Chargement de vos groupes...</p>
+  } @else if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  } @else {
+    @if (displayedGroupsInfo.length > 0) {
+      <div class="apprenant-groups-grid">
+        @for (item of displayedGroupsInfo; track item.groupId) {
+          <div class="apprenant-group-card">
+            <div class="apprenant-group-card-header">
+              <h3 class="brief-title-in-card">{{ item.briefTitle }}</h3>
+              @if (item.briefImageUrl) {
+                <img [src]="item.briefImageUrl" [alt]="item.briefTitle" class="brief-image-in-card">
+              } @else {
+                <div class="brief-image-placeholder-in-card">
+                  <span>{{ item.briefTitle ? item.briefTitle.substring(0,1).toUpperCase() : 'B' }}</span>
+                </div>
+              }
+            </div>
+            <div class="apprenant-group-card-body">
+              <h4 class="apprenant-group-name">Votre équipe : {{ item.groupName }}</h4>
+              @if (item.groupMembers.length > 0) {
+                <p class="coequipiers-label">Vos coéquipier(e)s :</p>
+                <ul class="coequipiers-list">
+                  @for (member of item.groupMembers; track member.id) {
+                    <li>{{ member.nom }}</li>
+                  }
+                </ul>
+              } @else {
+                <p class="no-coequipiers">Vous êtes seul(e) dans ce groupe pour le moment.</p>
+              }
+            </div>
+            <div class="apprenant-group-card-footer">
+              <a [routerLink]="['/apprenant/briefs', item.briefId]" class="button-secondary view-brief-button">
+                Voir le Brief
+              </a>
+              <!-- Tu pourrais ajouter un bouton pour voir plus de détails sur le groupe si nécessaire -->
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="no-groups-message empty-list-message">Vous n'êtes actuellement affecté(e) à aucun groupe de travail.</p>
+    }
+  }
+</div>

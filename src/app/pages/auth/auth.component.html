@@ -1,0 +1,316 @@
+<!-- Formulaire de Connexion (reste en dehors de la modale) -->
+<!-- C'est cette div principale qui aura le filtre flou -->
+<div
+  class="connexion"
+  [style.filter]="isRegisterModalOpen ? 'blur(4px)' : 'none'"
+>
+  <div class="connexion-wrapper">
+    <div class="logo">
+      <img src="assets/G.png" alt="Logo Simplon" />
+    </div>
+
+    <div class="form-and-buttons-container">
+      <!-- Formulaire de Connexion -->
+      <form class="auth-form" id="login-form" (ngSubmit)="onLoginSubmit()">
+        <h2>Connexion</h2>
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input
+            type="email"
+            id="login-email"
+            name="loginEmail"
+            placeholder="Votre email"
+            required
+            [(ngModel)]="loginData.email"
+          />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Mot de passe</label>
+          <input
+            type="password"
+            id="login-password"
+            name="loginPassword"
+            placeholder="Votre mot de passe"
+            required
+            [(ngModel)]="loginData.password"
+          />
+          <a href="#" class="forgot-password">Mot de passe oublié ?</a>
+        </div>
+        @if (loginError) {
+        <p class="error-message">{{ loginError }}</p>
+        }
+        <div class="buttons">
+          <!-- Ce bouton doit soumettre le formulaire -->
+          <button type="submit" (click)="onLoginSubmit()">Se connecter</button>
+          <!-- Ce bouton ouvre la modale -->
+          <button type="button" (click)="openRegisterModal()">
+            S'inscrire
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- Fin de form-and-buttons-container -->
+  </div>
+  <!-- Fin de connexion-wrapper -->
+</div>
+<!-- Fin de la div.connexion principale -->
+
+<!-- MODALE D'INSCRIPTION -->
+@if (isRegisterModalOpen) {
+<div class="modal-overlay" (click)="closeRegisterModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button
+      class="modal-close-button"
+      (click)="closeRegisterModal()"
+      aria-label="Fermer la modale"
+    >
+      ×
+    </button>
+
+    @switch (registrationStep) { @case ('roleSelection') {
+    <div class="modal-header">
+      <h2>Créer un compte</h2>
+      <p>Veuillez choisir votre rôle :</p>
+    </div>
+    <div class="modal-body role-selection-modal">
+      <button
+        type="button"
+        class="role-button"
+        (click)="selectRole('apprenant')"
+      >
+        <span class="role-icon">🎓</span>
+        Je suis Apprenant
+      </button>
+      <button
+        type="button"
+        class="role-button"
+        (click)="selectRole('formateur')"
+      >
+        <span class="role-icon">🧑‍🏫</span>
+        Je suis Formateur
+      </button>
+    </div>
+    } @case ('formApprenant') {
+    <!-- Étape 2: Formulaire Apprenant -->
+    <div class="modal-header">
+      <h2>Inscription Apprenant</h2>
+      <button type="button" class="back-button" (click)="backToRoleSelection()">
+        ← Changer de rôle
+      </button>
+    </div>
+    <form
+      class="auth-form modal-form"
+      id="register-apprenant-form"
+      (ngSubmit)="onRegisterApprenantSubmit()"
+    >
+      <!-- Nom, Email, Mot de passe (déjà présents) -->
+      <div class="form-group">
+        <label for="reg-app-name">Nom complet</label>
+        <input
+          type="text"
+          id="reg-app-name"
+          name="regAppName"
+          placeholder="Votre nom complet"
+          required
+          [(ngModel)]="registerApprenantData.name"
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-app-email">Email</label>
+        <input
+          type="email"
+          id="reg-app-email"
+          name="regAppEmail"
+          placeholder="Votre email"
+          required
+          [(ngModel)]="registerApprenantData.email"
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-app-password">Mot de passe</label>
+        <input
+          type="password"
+          id="reg-app-password"
+          name="regAppPassword"
+          placeholder="Choisissez un mot de passe"
+          required
+          [(ngModel)]="registerApprenantData.password"
+        />
+      </div>
+
+      <!-- NOUVEAUX CHAMPS SPÉCIFIQUES À L'APPRENANT -->
+      <div class="form-group">
+        <label for="reg-app-genre">Genre</label>
+        <select
+          id="reg-app-genre"
+          name="regAppGenre"
+          required
+          [(ngModel)]="registerApprenantData.genre"
+        >
+          <option value="" disabled>-- Sélectionnez --</option>
+          <option value="masculin">Masculin</option>
+          <option value="feminin">Féminin</option>
+          <option value="nsp">Ne se prononce pas</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-app-aisance"
+          >Aisance en Français (1=Débutant, 4=Avancé)</label
+        >
+        <select
+          id="reg-app-aisance"
+          name="regAppAisance"
+          required
+          [(ngModel)]="registerApprenantData.aisanceFrancais"
+        >
+          <option value="0" disabled>-- Sélectionnez un niveau --</option>
+          <option value="1">1 - Débutant</option>
+          <option value="2">2 - Intermédiaire faible</option>
+          <option value="3">3 - Intermédiaire fort</option>
+          <option value="4">4 - Avancé</option>
+        </select>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <input
+          type="checkbox"
+          id="reg-app-dwwm"
+          name="regAppDwwm"
+          [(ngModel)]="registerApprenantData.ancienDWWM"
+        />
+        <label for="reg-app-dwwm"
+          >Ancien DWWM (Développeur Web et Web Mobile)</label
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="reg-app-niveau-tech"
+          >Niveau technique (1=Débutant, 4=Avancé)</label
+        >
+        <select
+          id="reg-app-niveau-tech"
+          name="regAppNiveauTech"
+          required
+          [(ngModel)]="registerApprenantData.niveauTechnique"
+        >
+          <option value="0" disabled>-- Sélectionnez un niveau --</option>
+          <option value="1">1 - Débutant</option>
+          <option value="2">2 - Bases acquises</option>
+          <option value="3">3 - Autonome sur projets simples</option>
+          <option value="4">4 - Expérimenté / Peut aider les autres</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-app-profil">Profil</label>
+        <select
+          id="reg-app-profil"
+          name="regAppProfil"
+          required
+          [(ngModel)]="registerApprenantData.profil"
+        >
+          <option value="" disabled>-- Sélectionnez --</option>
+          <option value="timide">Timide</option>
+          <option value="reserve">Réservé(e)</option>
+          <option value="alaise">À l'aise</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="reg-app-age">Âge</label>
+        <input
+          type="number"
+          id="reg-app-age"
+          name="regAppAge"
+          placeholder="Votre âge"
+          required
+          min="1"
+          max="99"
+          [(ngModel)]="registerApprenantData.age"
+        />
+      </div>
+      <!-- Fin des nouveaux champs -->
+
+      @if (registerError) {
+      <p class="error-message">{{ registerError }}</p>
+      } @if (registerSuccess) {
+      <p class="success-message">{{ registerSuccess }}</p>
+      }
+      <div class="buttons">
+        <button type="submit">Créer mon compte Apprenant</button>
+      </div>
+    </form>
+    } @case ('formFormateur') {
+    <div class="modal-header">
+      <h2>Inscription Formateur</h2>
+      <button type="button" class="back-button" (click)="backToRoleSelection()">
+        ← Changer de rôle
+      </button>
+    </div>
+    <form
+      class="auth-form modal-form"
+      id="register-formateur-form"
+      (ngSubmit)="onRegisterFormateurSubmit()"
+    >
+      <div class="form-group">
+        <label for="reg-form-orga">Nom de l'organisation (optionnel)</label>
+        <input
+          type="text"
+          id="reg-form-orga"
+          name="regFormOrga"
+          placeholder="Nom de votre organisation"
+          [(ngModel)]="registerFormateurData.organizationName"
+        />
+      </div>
+      <div class="form-group">
+        <div class="form-group">
+          <label for="reg-form-name">Nom complet</label>
+          <input
+            type="text"
+            id="reg-form-name"
+            name="regFormName"
+            placeholder="Votre nom complet"
+            required
+            [(ngModel)]="registerFormateurData.name"
+          />
+        </div>
+
+        <label for="reg-form-email">Email</label>
+        <input
+          type="email"
+          id="reg-form-email"
+          name="regFormEmail"
+          placeholder="Votre email professionnel"
+          required
+          [(ngModel)]="registerFormateurData.email"
+        />
+      </div>
+      <div class="form-group">
+        <label for="reg-form-password">Mot de passe</label>
+        <input
+          type="password"
+          id="reg-form-password"
+          name="regFormPassword"
+          placeholder="Choisissez un mot de passe"
+          required
+          [(ngModel)]="registerFormateurData.password"
+        />
+      </div>
+      @if (registerError) {
+      <p class="error-message">{{ registerError }}</p>
+      } @if (registerSuccess) {
+      <p class="success-message">{{ registerSuccess }}</p>
+      }
+      <div class="buttons">
+        <button type="submit">Créer mon compte Formateur</button>
+      </div>
+    </form>
+    } }
+    <!-- Fin du @switch -->
+  </div>
+  <!-- Fin de .modal-content -->
+</div>
+<!-- Fin de .modal-overlay -->
+}
+<!-- Fin du @if pour isRegisterModalOpen -->

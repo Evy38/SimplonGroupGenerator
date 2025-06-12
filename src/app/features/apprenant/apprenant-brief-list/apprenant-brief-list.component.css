@@ -1,0 +1,438 @@
+/* src/app/features/apprenant/apprenant-brief-list/apprenant-brief-list.component.css */
+
+/* ================================================ */
+/* STYLES GÉNÉRAUX DE LA PAGE (Adaptés du formateur) */
+/* ================================================ */
+.page-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.page-header h1 {
+  font-size: 24px; /* Taille mobile */
+  color: #333;
+  font-weight: 600;
+}
+
+.brief-list-container.apprenant-view {
+  padding: 15px;
+}
+
+.loading-message,
+.error-message,
+.no-briefs-message.empty-list-message {
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1em;
+  color: #555;
+}
+.error-message {
+  color: red;
+  border: 1px solid red;
+  background-color: #ffe0e0;
+}
+
+/* ================================================ */
+/* GRILLE DES CARTES (Mobile First: une colonne) */
+/* ================================================ */
+.brief-list { /* Équivalent à .brief-cards-container du formateur */
+  display: grid;
+  grid-template-columns: 1fr; /* Une colonne par défaut */
+  gap: 15px;
+}
+
+/* ================================================ */
+/* CARTE DE BRIEF APPRENANT - MOBILE FIRST (Layout Compact) */
+/* ================================================ */
+.brief-card.apprenant-brief-item { /* Utilise .brief-card comme base */
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+  /* --- Styles pour le layout compact mobile --- */
+  display: flex;
+  align-items: center;
+  padding: 10px; /* Padding interne de la carte */
+  overflow: hidden; /* Pour gérer l'ellipsis dans les enfants */
+}
+.brief-card.apprenant-brief-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.2);
+}
+
+/* Conteneur principal à l'intérieur de la carte pour image + contenu texte */
+.apprenant-brief-card-main {
+  display: flex;
+  align-items: center;
+  flex-grow: 1; /* Pour qu'il prenne l'espace avant les actions */
+  gap: 10px;    /* Espace entre l'image et le bloc de texte */
+  overflow: hidden; /* Pour aider à l'ellipsis des enfants */
+}
+
+/* Section Image (Gauche) - Utilise .brief-card-image */
+.brief-card-image.apprenant-brief-image {
+  flex-shrink: 0;
+  width: 55px;
+  height: 55px;
+  border-radius: 6px;
+  overflow: hidden; /* Pour que l'image respecte le border-radius */
+  background-color: #f0f0f0; /* Fond pour le placeholder */
+  margin: 0; /* Annuler les marges de .brief-card-image du formateur si besoin */
+  display: flex; /* Pour centrer le placeholder */
+  align-items: center;
+  justify-content: center;
+}
+.brief-card-image.apprenant-brief-image img { /* Cible l'image DANS le conteneur */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0; /* L'arrondi est sur le parent */
+}
+.apprenant-brief-image-placeholder { /* Le div placeholder */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #888;
+  font-weight: 500;
+  background-color: #e9ecef; /* Peut être le même que .apprenant-brief-image */
+}
+.apprenant-brief-image-placeholder span { line-height: 1; }
+
+
+/* Section Contenu Textuel (Milieu) - Utilise .brief-card-content */
+.brief-card-content.apprenant-brief-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden; /* Essentiel pour l'ellipsis */
+  padding: 0; /* Pas de padding ici, les marges des enfants gèrent */
+  min-width: 0; /* Pour que flexbox permette l'ellipsis */
+}
+/* Utilise .brief-name pour le titre */
+.brief-card-content.apprenant-brief-content .brief-name {
+  font-size: 0.95em;
+  font-weight: 600; /* Un peu moins gras que le formateur peut-être */
+  color: #334155; /* Inspiré de l'image */
+  margin: 0 0 2px 0; /* Marge inférieure réduite */
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Utilise .brief-description */
+.brief-card-content.apprenant-brief-content .brief-description {
+  font-size: 0.8em;
+  color: #4B5563;
+  margin: 0 0 3px 0;
+  line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  /* slice:0:40 dans le HTML */
+}
+/* Utilise .brief-assigned-group pour l'info promo */
+.brief-card-content.apprenant-brief-content .brief-assigned-group {
+  font-size: 0.75em;
+  color: #6B7280;
+  margin: 0 0 3px 0; /* Espace avant la date */
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.brief-card-content.apprenant-brief-content .brief-assigned-group strong {
+  font-weight: 500; /* Moins gras que le formateur peut-être */
+  color: #4B5563; /* Un peu plus foncé pour le nom de la promo */
+}
+/* Nouvelle classe pour la date */
+.apprenant-brief-date-info {
+  font-size: 0.75em;
+  color: #6B7280;
+  font-weight: bold; /* Date en gras comme sur l'image */
+  margin: 0;
+  line-height: 1.2;
+}
+.apprenant-brief-date-info strong {
+  font-weight: bold; /* S'assurer que la date est en gras si le span ne suffit pas */
+}
+
+/* Section Actions (Bouton "Détails" - Droite) - Utilise .brief-card-actions */
+.brief-card-actions.apprenant-brief-actions {
+  flex-shrink: 0; /* Ne pas rétrécir */
+  padding: 0; /* Pas de padding pour le conteneur d'actions */
+  margin-left: 8px; /* Espace entre le contenu et le bouton */
+  border-top: none; /* Pas de bordure en mobile */
+  background-color: transparent; /* Pas de fond en mobile */
+  display: flex; /* Pour aligner le bouton si jamais il y en a plusieurs */
+  align-items: center;
+  justify-content: center; /* Centre le bouton verticalement et horizontalement dans son espace */
+}
+/* Le bouton utilise .button-primary et .view-details-button */
+.button-primary.view-details-button {
+  background-color: #123744; /* Bleu clair, exemple */
+  color: white;
+  padding: 5px 10px; /* Petit bouton */
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 0.75em; /* Petit texte */
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  border: none;
+}
+.button-primary.view-details-button:hover {
+  background-color: #3B82F6; /* Plus foncé au survol */
+}
+
+/* Style global pour .button-primary si pas déjà fait ailleurs pour cohérence */
+/* Si .button-primary est déjà stylé globalement, ces règles peuvent être redondantes ou servir de fallback */
+.button-primary {
+  background-color: #14343c; color: white; border: none; border-radius: 6px; font-weight: 500; text-decoration: none; cursor: pointer; transition: background-color 0.2s ease; display: inline-block;
+  padding: 8px 16px; /* Padding par défaut */
+  font-size: 0.9em;  /* Taille de police par défaut */
+}
+.button-primary:hover {
+  background-color: #0d2329;
+}
+
+/* ================================================ */
+/* STYLES POUR LA MODALE DE DÉTAIL DU BRIEF         */
+/* (Inspiré des styles de modale formateur)         */
+/* ================================================ */
+
+/* Classe pour flouter le fond quand une modale est ouverte */
+.brief-list-container.apprenant-view.blurred {
+  filter: blur(3px);
+  transition: filter 0.3s ease-out;
+}
+
+.modal-overlay.apprenant-brief-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.65); /* Même overlay que formateur */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050; /* Au-dessus du reste */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modal-content.apprenant-brief-detail-modal-content {
+  background-color: #ffffff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 600px; /* Largeur max de la modale de détail */
+  position: relative;
+  max-height: 90vh; /* Hauteur max, avec scroll si contenu long */
+  overflow-y: auto; /* Permet le scroll vertical */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-close-button { /* Style commun de bouton de fermeture */
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: bold;
+  color: #777;
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px;
+}
+.modal-close-button:hover {
+  color: #333;
+}
+
+.modal-header { /* Style commun de header de modale */
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eaeaea;
+  width: 100%;
+}
+.modal-header h2 {
+  font-size: 22px;
+  color: #2c3e50; /* Couleur de titre formateur */
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-body.brief-detail-modal-body {
+  padding: 10px 0; /* Espace interne du corps de la modale */
+  flex-grow: 1; /* Pour que le corps prenne l'espace disponible */
+}
+
+.brief-detail-image-container {
+  width: 100%;
+  max-height: 300px; /* Limiter la hauteur de l'image */
+  overflow: hidden;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.brief-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 'contain' pour voir toute l'image, ou 'cover' */
+}
+
+.brief-detail-section {
+  margin-bottom: 18px;
+}
+.brief-detail-section h4 {
+  font-size: 1em;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+.brief-detail-section p,
+.brief-detail-section ul {
+  font-size: 0.95em;
+  color: #444;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+.brief-detail-section ul {
+  list-style-position: inside;
+  padding-left: 5px; /* Petit retrait pour les listes */
+}
+.brief-detail-section ul li {
+  margin-bottom: 4px;
+}
+
+
+.modal-footer.buttons { /* Style commun pour le pied de page des modales */
+  display: flex;
+  justify-content: flex-end; /* Boutons à droite par défaut */
+  gap: 12px;
+  margin-top: 25px; /* Espace au-dessus du footer */
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+  width: 100%;
+}
+
+/* Réutilisation des styles de boutons .button-secondary que tu as déjà */
+.button-secondary {
+  background-color: #6c757d; color: white;
+  padding: 10px 20px; border: none; border-radius: 6px; font-weight: 500; font-size: 0.95em; cursor: pointer; transition: background-color 0.2s ease;
+}
+.button-secondary:hover { background-color: #5a6268; }
+
+
+/* ================================================ */
+/* MEDIA QUERIES - TABLETTE PAYSAGE ET PC (Layout "Carré" inspiré du formateur) */
+/* ================================================ */
+@media (min-width: 768px) {
+  .page-header h1 { font-size: 28px; }
+  .brief-list-container.apprenant-view { padding: 20px; }
+
+  .brief-list {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+  }
+
+  .brief-card.apprenant-brief-item {
+    flex-direction: column; /* Image en haut, puis main-content, puis actions */
+    align-items: stretch;
+    padding: 0; /* Le padding sera sur les sections internes */
+    gap: 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12); /* Style formateur */
+    cursor: default; /* La carte n'est plus globalement cliquable si [routerLink] est enlevé de .brief-card */
+  }
+  .brief-card.apprenant-brief-item:hover { /* Comportement au survol pour la carte carrée */
+    transform: translateY(-5px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+
+  .apprenant-brief-card-main {
+    flex-direction: column; /* En desktop, image est au-dessus du texte DANS le main content */
+    align-items: stretch;
+    padding: 0; /* Pas de padding sur le main, mais sur ses enfants */
+    gap: 0;
+    /* flex-grow: 1; */ /* Le contenu interne grandira */
+  }
+
+  .brief-card-image.apprenant-brief-image {
+    width: 110%;
+    height: 200px;
+    border-radius: 12px 12px 0 0; /* Arrondi en haut seulement */
+    margin-right: 0; /* Annuler marge mobile */
+  }
+  .apprenant-brief-image-placeholder {
+    border-radius: 12px 12px 0 0;
+    font-size: 2.5rem;
+  }
+
+  .brief-card-content.apprenant-brief-content {
+    padding: 15px 18px; /* Padding interne pour le contenu */
+    min-height: 110px; /* Hauteur minimale pour aligner les cartes */
+    justify-content: space-between; /* Pour que la description puisse grandir */
+  }
+  .brief-card-content.apprenant-brief-content .brief-name {
+    font-size: 1.15em;
+    white-space: normal; /* Permettre le retour à la ligne */
+    margin-bottom: 8px;
+  }
+  .brief-card-content.apprenant-brief-content .brief-description {
+    font-size: 0.9em; line-height: 1.4; margin-bottom: 10px; white-space: normal;
+    /* Pour limiter à N lignes si tu veux : */
+    /* overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+    -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; */
+  }
+  .brief-card-content.apprenant-brief-content .brief-assigned-group {
+    font-size: 0.8em; margin-bottom: 8px; white-space: normal;
+  }
+  .apprenant-brief-date-info {
+    font-size: 0.8em;
+    margin-top: auto; /* Pousse la date en bas du contenu */
+    padding-top: 8px;
+    font-weight: normal; /* Rétablir le poids normal pour la date en desktop */
+  }
+
+  /* Section actions pour desktop */
+  .brief-card-actions.apprenant-brief-actions {
+    padding: 10px 18px;
+    border-top: 1px solid #f0f0f0;
+    background-color: #f9f9f9; /* Fond comme sur formateur */
+    justify-content: flex-end; /* Bouton à droite */
+    width: 100%; /* S'assurer qu'il prend toute la largeur */
+    margin-left: 0; /* Annuler la marge mobile */
+  }
+  /* Rétablir le style standard du bouton "Voir les détails" pour desktop */
+  .button-primary.view-details-button {
+    font-size: 0.9em;
+    padding: 8px 16px;
+    background-color: #123744; /* Fond bleu foncé standard du formateur */
+    color: white;
+  }
+  .button-primary.view-details-button:hover {
+    background-color: #0d2329;
+  }
+  .modal-content.apprenant-brief-detail-modal-content {
+    padding: 20px 15px; /* Moins de padding sur petits écrans */
+  }
+  .modal-header h2 {
+    font-size: 20px;
+  }
+  .brief-detail-section h4 {
+    font-size: 0.95em;
+  }
+  .brief-detail-section p,
+  .brief-detail-section ul {
+    font-size: 0.9em;
+  }
+  .modal-footer.buttons {
+    justify-content: center;
+}}

@@ -1,0 +1,131 @@
+<!-- src/app/features/apprenant/apprenant-brief-list/apprenant-brief-list.component.html -->
+<header class="page-header">
+  <h1>Mes Briefs</h1>
+</header>
+
+<div class="brief-list-container apprenant-view"
+     [class.blurred]="isBriefDetailModalOpen"> <!-- Flouter le fond quand la modale est ouverte -->
+
+  @if (isLoading) {
+    <p class="loading-message">Chargement des briefs en cours...</p>
+  } @else if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+  } @else {
+    @if (apprenantBriefs.length > 0) {
+      <div class="brief-list">
+        @for (brief of apprenantBriefs; track brief.id) {
+          <div class="brief-card apprenant-brief-item">
+
+            <div class="apprenant-brief-card-main">
+              <div class="brief-card-image apprenant-brief-image">
+                @if (brief.imageUrl) {
+                  <img [src]="brief.imageUrl" [alt]="brief.title">
+                } @else {
+                  <div class="apprenant-brief-image-placeholder">
+                    <span>{{ brief.title ? brief.title.substring(0,1).toUpperCase() : 'B' }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="brief-card-content apprenant-brief-content">
+                <h3 class="brief-name">{{ brief.title }}</h3>
+                <p class="brief-description">
+                  {{ brief.description | slice:0:40 }}{{ brief.description.length > 40 ? '...' : '' }}
+                </p>
+                @if (getPromoName(brief.promoId); as promoName) {
+                  <p class="brief-assigned-group">
+                    Promo : <strong>{{ promoName }}</strong>
+                  </p>
+                }
+                <p class="apprenant-brief-date-info">
+                  @if (brief.creationDate) {
+                    Publié le : <strong>{{ brief.creationDate | date:'dd/MM/yyyy' }}</strong>
+                  }
+                </p>
+              </div>
+            </div>
+
+            <div class="brief-card-actions apprenant-brief-actions">
+              <!-- MODIFIÉ : (click) appelle openBriefDetailModal -->
+              <button type="button"
+                      (click)="openBriefDetailModal(brief)"
+                      class="button-primary view-details-button apprenant-details-button"
+                      title="Voir les détails du brief">
+                Détails
+              </button>
+            </div>
+
+          </div> <!-- Fin .brief-card .apprenant-brief-item -->
+        }
+      </div>
+    } @else {
+      <p class="no-briefs-message empty-list-message">Aucun brief n'est actuellement assigné à votre promotion.</p>
+    }
+  }
+</div>
+
+<!-- ================================================ -->
+<!-- MODALE POUR LES DÉTAILS DU BRIEF (APPRENANT)     -->
+<!-- ================================================ -->
+@if (isBriefDetailModalOpen && selectedBriefForModal) {
+  <div class="modal-overlay apprenant-brief-detail-modal-overlay" (click)="closeBriefDetailModal()">
+    <div class="modal-content apprenant-brief-detail-modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close-button" (click)="closeBriefDetailModal()" aria-label="Fermer la modale">×</button>
+
+      <div class="modal-header">
+        <h2>{{ selectedBriefForModal.title }}</h2>
+      </div>
+
+      <div class="modal-body brief-detail-modal-body">
+        @if (selectedBriefForModal.imageUrl) {
+          <div class="brief-detail-image-container">
+            <img [src]="selectedBriefForModal.imageUrl" [alt]="selectedBriefForModal.title" class="brief-detail-image">
+          </div>
+        }
+
+        <div class="brief-detail-section">
+          <h4>Description complète :</h4>
+          <p>{{ selectedBriefForModal.description }}</p>
+        </div>
+
+        @if (getPromoName(selectedBriefForModal.promoId); as promoName) {
+          <div class="brief-detail-section">
+            <h4>Promo concernée :</h4>
+            <p>{{ promoName }}</p>
+          </div>
+        }
+
+        <div class="brief-detail-section">
+          <h4>Date de création :</h4>
+          <p>{{ selectedBriefForModal.creationDate | date:'fullDate' }}</p> <!-- Format de date plus complet -->
+        </div>
+
+        <!-- Tu peux ajouter d'autres champs du brief ici si nécessaire -->
+        <!-- Par exemple, si ton modèle Brief a 'context', 'evaluationCriteria', 'learningOutcomes', 'resources' -->
+        <!--
+        @if (selectedBriefForModal.context) {
+          <div class="brief-detail-section">
+            <h4>Contexte :</h4>
+            <p>{{ selectedBriefForModal.context }}</p>
+          </div>
+        }
+        @if (selectedBriefForModal.evaluationCriteria && selectedBriefForModal.evaluationCriteria.length > 0) {
+          <div class="brief-detail-section">
+            <h4>Critères d'évaluation :</h4>
+            <ul>
+              @for(criterion of selectedBriefForModal.evaluationCriteria; track $index) {
+                <li>{{ criterion }}</li>
+              }
+            </ul>
+          </div>
+        }
+        -->
+      </div>
+
+      <div class="modal-footer buttons"> <!-- Réutilisation de la classe 'buttons' pour la disposition -->
+        <button type="button" class="button-secondary" (click)="closeBriefDetailModal()">Fermer</button>
+        <!-- Potentiellement un autre bouton d'action pour l'apprenant lié au brief si pertinent -->
+      </div>
+    </div>
+  </div>
+}

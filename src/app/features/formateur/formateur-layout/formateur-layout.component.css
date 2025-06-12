@@ -1,0 +1,96 @@
+.formateur-layout-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative; /* Toujours utile si des enfants sont positionnés absolument */
+}
+
+/* --- STYLES DE BASE (MOBILE FIRST) --- */
+
+.sidebar-toggle-button {
+  display: block; /* VISIBLE par défaut sur mobile */
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1020; /* Au-dessus du contenu, potentiellement en dessous de la sidebar ouverte */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  line-height: 38px;
+  text-align: center;
+}
+
+.formateur-sidebar {
+  width: 80px; /* Largeur mobile de la sidebar quand elle est ouverte */
+  /* Styles pour la cacher/afficher par défaut sur mobile (hors de l'écran) */
+  position: fixed; /* Sort du flux, se superpose */
+  left: 0;
+  top: 0;
+  height: 100vh;
+  transform: translateX(-100%); /* Cachée par défaut à gauche */
+  transition: transform 0.3s ease-in-out;
+  z-index: 1015; 
+  width: 160px;
+}
+
+.formateur-sidebar.open { /* Quand la classe .open est ajoutée par Angular */
+  transform: translateX(0); /* La fait apparaître */
+}
+
+.formateur-content {
+  flex-grow: 1;
+  padding: 20px;
+  padding-top: 70px; /* Espace pour le bouton burger fixe en haut */
+  background-color: #f4f7f6;
+  overflow-y: auto;
+  background-image: url("../../../../assets/BGSimplon.png");
+  /* Pas de transition sur margin-left ici car la sidebar est 'fixed' sur mobile */
+}
+
+
+.mobile-sidebar-overlay {
+  display: none; 
+}
+
+@media (max-width: 767.98px) {
+  .formateur-sidebar.open ~ .mobile-sidebar-overlay, 
+  .formateur-layout-container:has(.formateur-sidebar.open) .mobile-sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    z-index: 1010; 
+  }
+}
+
+
+
+/* === MEDIA QUERIES POUR TABLETTE ET PLUS (768px et au-dessus) === */
+@media (min-width: 768px) {
+  .sidebar-toggle-button {
+    display: none; /* CACHÉ sur les écrans plus grands */
+  }
+
+  .formateur-sidebar {
+    position: sticky; /* Revient à un comportement "sticky" normal */
+    transform: translateX(0); /* Toujours visible et à sa place */
+    width: 240px; /* Largeur pour tablette/desktop (peut aussi être dans sidebar.component.css) */
+    /* box-shadow: 2px 0 5px rgba(0,0,0,0.04); // L'ombre de base de la sidebar */
+    /* z-index n'est plus aussi critique ici, mais peut être gardé */
+  }
+  /* .formateur-sidebar.open n'a plus d'effet de transformation ici */
+
+
+  .formateur-content {
+    padding: 25px 35px; /* Réajuster le padding */
+    padding-top: 25px; /* Plus besoin de l'espace pour le burger */
+    /* Le décalage du contenu est géré par le flexbox du parent et la largeur de la sidebar */
+  }
+}

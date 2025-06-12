@@ -1,0 +1,33 @@
+<!-- src/app/shared/components/sidebar/sidebar.component.html -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="/assets/G.png" alt="Logo Application" class="app-logo">
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li>
+                <!-- routerLink pointera vers la route de la liste des groupes -->
+                <a routerLink="promos" routerLinkActive="active-link">Mes Promos</a>
+            </li>
+            <li>
+                <!-- routerLink pointera vers la route de la liste des briefs -->
+                <a routerLink="briefs" routerLinkActive="active-link">Mes Briefs</a>
+            </li>
+            <!-- Tu pourrais ajouter d'autres liens ici plus tard -->
+        </ul>
+    </nav>
+
+      <div class="sidebar-footer">
+
+        <button class="buttons" (click)="logout()">
+            <img src="/assets/Logout.png" alt="Icône Déconnexion">
+            <span class="button-text">Déconnexion</span>
+        </button>
+
+        <button class="buttons" routerLink="profil" routerLinkActive="active-link"> 
+            <img src="/assets/Profile.png" alt="Icône Profil">
+            <span class="button-text">Profil</span>
+        </button>
+
+    </div>

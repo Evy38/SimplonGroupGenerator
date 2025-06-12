@@ -1,0 +1,46 @@
+<!-- src/app/features/apprenant/components/apprenant-sidebar/apprenant-sidebar.component.html -->
+<!-- L'élément <aside> utilise la classe 'sidebar' de ton CSS partagé (sidebar.component.css)
+     et la classe 'open' est conditionnée par l'Input 'isOpen' venant du layout. -->
+<aside class="sidebar" [class.open]="isOpen">
+  <!-- 'sidebar' est la classe de base de ton sidebar.component.css -->
+  <div class="sidebar-header">
+    <a routerLink="/apprenant/dashboard" class="logo-link">
+      <img src="assets/G.png" alt="Logo Application" class="app-logo" />
+      <!-- Ton logo -->
+    </a>
+    <!-- PAS de bouton croix ici, car géré par le layout parent -->
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul>
+      <li>
+        <a routerLink="/apprenant/mes-briefs" routerLinkActive="active-link">
+          <span>Mes Briefs</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/apprenant/mes-groupes" routerLinkActive="active-link">
+          <span>Mes Groupes</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="buttons" (click)="logout()">
+      <img src="/assets/Logout.png" alt="Icône Déconnexion" />
+      <span class="button-text">Déconnexion</span>
+    </button>
+
+    <button
+      class="buttons"
+      routerLink="/apprenant/profil"
+      routerLinkActive="active-link"
+    >
+      <img src="/assets/Profile.png" alt="Icône Profil" />
+      <span class="button-text">Profil</span>
+    </button>
+  </div>
+</aside>
+<!-- PAS de bouton burger global ici -->
+<!-- PAS d'overlay ici -->

@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+    
+
+   @if (currentUser) {
+    <h1>Bienvenue, {{ currentUser.name }} !</h1>
+  } @else {
+    <h1>Bienvenue sur votre Dashboard !</h1>
+  } 
+  <p>
+    Ici, vous trouverez un aperçu de vos activités, des briefs en cours et des informations importantes.
+  </p>
+  <p>Contenu à venir...</p>
+
+  @if (currentUser) {
+    <div class="user-details">
+      <p><strong>ID Utilisateur :</strong> {{ currentUser.id }}</p>
+      <p><strong>Email :</strong> {{ currentUser.email }}</p>
+      <p><strong>Rôle :</strong> {{ currentUser.role }}</p>
+    </div>
+  }
+</div>

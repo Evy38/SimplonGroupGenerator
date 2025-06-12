@@ -1,0 +1,43 @@
+/* Dans le CSS de ApprenantSidebarComponent (ou le CSS partagé qu'il utilise) */
+
+
+
+/* L'élément aside principal de la sidebar */
+.sidebar { /* Ou la classe racine de ton <aside> */
+  /* ... tes styles d'apparence (couleur, padding, etc.) ... */
+
+  /* Mécanique pour mobile */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px; /* Ou ta largeur de sidebar */
+  z-index: 1020; /* IMPORTANT: supérieur à l'overlay du layout */
+  background-color: #fff; /* Pour qu'elle soit opaque */
+  transform: translateX(-100%); /* Cachée par défaut */
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.open { /* La classe appliquée par [class.open]="isSidebarOpen" */
+  transform: translateX(0); /* La montre */
+}
+
+/* Bouton croix à l'intérieur de la sidebar pour la fermer en mode mobile */
+/* .toggle-btn-close { /* Ton nom de classe pour la croix */
+  /* Styles pour le positionner dans le header de la sidebar */
+  /* display géré par @if (isMobileView && isSidebarOpen) dans le template de la sidebar } */
+
+/* Comportement Desktop */
+@media (min-width: 768px) { /* Ton breakpoint */
+  .sidebar-toggle-btn-global,
+  .toggle-btn-close {
+    display: none !important; /* Cache les boutons de bascule mobile */
+  }
+
+  .sidebar {
+    position: sticky; /* Ou 'static' si elle fait partie du flux normal */
+    transform: translateX(0); /* Toujours visible, pas de transformation */
+    /* La largeur pour desktop (ex: 260px) est déjà définie ci-dessus ou peut être ajustée ici */
+    /* z-index: auto; ou une valeur appropriée pour le desktop */
+  }
+}

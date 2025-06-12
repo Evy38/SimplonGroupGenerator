@@ -1,0 +1,238 @@
+/* src/app/shared/components/sidebar/sidebar.component.css */
+* {
+  box-sizing: border-box;
+}
+body {
+  background-color: red;
+}
+
+.sidebar {
+  width: 80px; /* Largeur RÉDUITE pour mobile par défaut */
+  background-color: #ffffff;
+  color: #333333;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  /* position: sticky; */
+  /* top: 0; */
+  border-right: 1px solid #e0e0e0;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.04);
+  z-index: 1010;
+  
+}
+
+.sidebar-header {
+  padding: 15px 0;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  height: 70px; /* Hauteur fixe pour le header */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-logo {
+  max-width: 40px;
+  max-height: 40px;
+  height: auto;
+  display: block;
+  /* Par défaut, le logo est visible */
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  padding-top: 20px;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li a {
+  display: flex;
+  flex-direction: column; /* Force les mots à aller en colonne */
+  align-items: flex-start;
+  padding: 5px;
+  text-decoration: none;
+  color: #555555;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease, border-left 0.2s ease;
+  border-left: 4px solid transparent;
+  white-space: normal;  /* autorise le retour à la ligne */
+  width: 100%;          /* occupe toute la largeur définie par la sidebar */
+  box-sizing: border-box;
+}
+
+.sidebar-nav li a:hover {
+  background-color: #f5f5f5; /* Fond léger au survol */
+  color: #123744; /* Couleur principale au survol */
+    font-weight: 700;
+}
+
+.sidebar-nav li a.active-link {
+  background-color: #e9f3f5; /* Fond légèrement bleuté pour l'actif */
+  color: #123744; /* Couleur principale pour l'actif */
+  border-left-color: #123744; /* Indicateur de lien actif */
+}
+
+
+.sidebar-footer {
+  padding: 10px 5px; 
+  border-top: 1px solid #e0e0e0;
+  display: flex; 
+  justify-content: space-around; 
+  align-items: center; 
+  flex-direction: column;
+}
+
+.sidebar-footer .buttons .button-text {
+  display: none; /* CACHÉ PAR DÉFAUT (Mobile & Tablette Portrait) */
+  margin-left: 8px; /* Espace entre l'icône et le texte quand il est visible */
+  font-size: 14px;  /* Taille du texte quand il est visible */
+  color: #555555;   /* Couleur du texte (à ajuster) */
+  white-space: nowrap; /* Empêche le texte du bouton de passer à la ligne */
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Cible les boutons avec la classe .buttons DANS .sidebar-footer */
+.sidebar-footer .buttons {
+  background-color: transparent; /* Ou la couleur de fond désirée */
+  border: none; /* Enlève la bordure par défaut des boutons */
+  padding: 5px; /* Petit padding interne pour l'icône */
+  cursor: pointer;
+  display: flex; /* Pour bien centrer l'image à l'intérieur */
+  align-items: center;
+  justify-content: center;
+ 
+}
+
+.sidebar-footer .buttons img {
+  max-width: 100%; 
+  height: auto;   
+  display: block; 
+   width: 35px;  
+   height: 35px; 
+}
+
+.sidebar-footer .buttons:hover {
+  background-color: #f0f0f0;
+}
+
+
+
+.logout-button:hover {
+  background-color: #dea9a3;
+  border-color: #c0392b;
+}
+
+
+@media (max-width: 767.98px) {
+  .sidebar-header {
+     padding: 10px 0; /* Moins de padding si le logo est caché */
+     border-bottom: none; /* Peut-être pas de bordure si pas de logo */
+  }
+  .app-logo {
+    display: none; /* CACHE LE LOGO */
+  }
+
+  .sidebar-nav {
+    padding-top: 10px; /* Commencer les liens plus haut si le header est plus petit/caché */
+  }
+}
+
+
+@media (min-width: 768px) and (orientation: portrait) {
+  .sidebar {
+    width: 180px; /* Ajuste cette largeur selon tes besoins */
+  }
+.sidebar-header {
+    padding: 25px 20px; /* Padding normal */
+    height: auto; /* Ou une hauteur qui convient au logo plus grand */
+    border-bottom: 1px solid #f0f0f0; /* Rétablir la bordure */
+  }
+  .sidebar-header .app-logo img {
+    width: 200px;;
+  }
+  .app-logo {
+    display: block; /* RÉAFFICHE LE LOGO */
+    max-width: 200px; /* Taille normale du logo */
+    max-height: none; /* Enlève la contrainte de hauteur si besoin */
+  }
+.sidebar-nav {
+  flex-grow: 1;
+  overflow-y: auto;
+    padding-top: 20px; /* Padding normal */
+  }
+  .sidebar-nav li a {
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 14px;
+    justify-content: flex-start;
+  }
+
+  /* Si tu as un <span class="nav-text"> pour le texte des liens principaux */
+  .sidebar-nav li a .nav-text {
+    display: inline; /* Ou block */
+    /* margin-left: 10px; /* Si tu as une icône avant ce texte */
+  }
+
+  .sidebar-footer .buttons img {
+    width: 30px;
+    height: 30px;
+  }
+ 
+}
+
+
+/* --------------------------------------------------------------------------
+   TABLETTE - PAYSAGE ET PC (Ex: à partir de 992px ou 1024px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 765px) { /* Ajuste ce point de rupture si besoin (ex: 1024px) */
+  .sidebar {
+    width: 240px; /* Ajuste cette largeur */
+  }
+
+  .app-logo {
+    max-width: 200px; /* Ajuste cette taille */
+  }
+
+  /* Liens de navigation principaux */
+  .sidebar-nav li a {
+    padding: 16px 25px;
+    font-size: 15px;
+    /* text-align: left; et justify-content: flex-start; sont hérités si la media query précédente s'est appliquée */
+  }
+
+  /* Footer avec texte pour les boutons */
+  .sidebar-footer {
+    padding: 20px;
+    /* align-items: stretch; /* Si les boutons restent en colonne et doivent s'étirer */
+  }
+
+  .sidebar-footer .buttons {
+    justify-content: flex-start; /* Aligne icône et texte à gauche du bouton */
+    padding: 10px 15px;
+    width: 100%; /* Boutons prennent toute la largeur du footer (si en colonne) */
+    box-sizing: border-box;
+  }
+
+  .sidebar-footer .buttons img {
+    width: 32px; /* Taille d'icône ajustée pour le texte */
+    height: 32px;
+  }
+
+  .sidebar-footer .buttons .button-text {
+    display: inline; /* AFFICHE LE TEXTE DES BOUTONS DU FOOTER */
+    margin-left: 10px;
+    font-size: 14px;
+    color: #555555; /* Ajuste la couleur */
+    white-space: nowrap;
+    
+  }
+}

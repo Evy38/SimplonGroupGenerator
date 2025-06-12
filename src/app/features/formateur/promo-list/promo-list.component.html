@@ -1,0 +1,180 @@
+<!-- src/app/features/formateur/promo-list/promo-list.component.html -->
+<header class="page-header">
+  <h1>Mes Promos</h1>
+</header>
+
+<!-- Liste des cartes de promo -->
+<div class="promo-cards-container" [class.blurred]="isCreateOrEditModalOpen || isConfirmDeleteModalOpen">
+  @for (promo of promos; track promo.id) {
+    <div class="promo-card" (click)="openPromoMembersModal(promo)"> <!-- CLASSE CHANGÉE -->
+      <!-- Tu peux ajouter un routerLink ici si cliquer sur une promo mène à une page de détail de la promo -->
+      <!-- <div class="promo-card-image-link-wrapper" [routerLink]="['/formateur/promos', promo.id]"> -->
+      <div class="promo-card-image-link-wrapper">
+        @if (promo.imageUrl) {
+          <div class="promo-card-image">
+            <img [src]="promo.imageUrl" [alt]="'Image pour ' + promo.name">
+          </div>
+        } @else {
+          <div class="promo-card-image placeholder-image">
+            <span>{{ promo.name.substring(0,1).toUpperCase() || 'P' }}</span> <!-- Initiale ou placeholder -->
+          </div>
+        }
+        <div class="promo-card-content">
+          <h3 class="promo-name">{{ promo.name }}</h3>
+          <p class="promo-members-count">{{ promo.members.length }} membre(s)</p>
+        </div>
+      </div>
+      <div class="promo-card-actions">
+        <button type="button" class="icon-button edit-button" title="Modifier la promo"
+                (click)="openEditPromoModal(promo); $event.stopPropagation();">
+          <img src="assets/pen.png" alt="Modifier">
+        </button>
+        <button type="button" class="icon-button delete-button" title="Supprimer la promo"
+                (click)="openConfirmDeletePromoModal(promo); $event.stopPropagation();">
+          <img src="assets/trash.png" alt="Supprimer">
+        </button>
+      </div>
+    </div>
+  } @empty {
+    <p class="empty-list-message">Vous n'avez pas encore de promos. Commencez par en créer une !</p>
+  }
+</div>
+
+<!-- Bouton "+" flottant pour créer une nouvelle promo -->
+<button type="button" class="fab-button" (click)="openCreatePromoModal()" title="Créer une nouvelle promo">
+  +
+</button>
+
+<!-- MODALE DE CRÉATION / MODIFICATION DE PROMO -->
+@if (isCreateOrEditModalOpen && currentPromoData) {
+  <div class="modal-overlay full-screen-modal-overlay" (click)="closeCreateOrEditModal()">
+    <div class="modal-content large-modal-content promo-modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close-button" (click)="closeCreateOrEditModal()" aria-label="Fermer la modale">×</button>
+
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Modifier la Promo' : 'Créer une Nouvelle Promo' }}</h2>
+      </div>
+
+      <form class="modal-form create-promo-form" (ngSubmit)="onSavePromoSubmit()">
+        <div class="form-group">
+          <label for="promo-name">Nom de la Promo :</label>
+          <input type="text" id="promo-name" name="promoName" placeholder="Ex: Les Poneys Agile" required
+                 [(ngModel)]="currentPromoData.name">
+        </div>
+
+        <div class="form-group">
+          <label for="promo-image-url">URL de l'image (optionnel) :</label>
+          <input type="url" id="promo-image-url" name="promoImageUrl" placeholder="https://exemple.com/image.jpg"
+                 [(ngModel)]="currentPromoData.imageUrl">
+        </div>
+
+        <!-- Section pour gérer les membres de la promo -->
+        <div class="form-section">
+          <h4>Membres de la Promo :</h4>
+          @if (currentPromoData.members.length > 0) {
+            <ul class="current-members-in-modal-list"> <!-- Réutiliser la classe si le style est similaire -->
+              @for (member of currentPromoData.members; track member.id) {
+                <li>
+                  <span>{{ member.nom }} <em>({{ member.email || 'email non défini' }})</em></span>
+                  <button type="button" class="remove-member-button" (click)="removePersonFromCurrentPromo(member)" title="Retirer {{member.nom}}">×</button>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="info-text">Aucune personne dans cette promo pour le moment.</p>
+          }
+
+          <hr class="form-divider">
+
+          <div class="add-person-input-section">
+            <h5>Ajouter une personne existante :</h5>
+            <div class="form-group inline-form-group">
+              <input type="text" id="add-promo-person-input" name="addPromoPersonInput"
+                     placeholder="Nom ou email de la personne à ajouter"
+                     [(ngModel)]="newPersonInput"
+                     (keyup.enter)="addPersonFromInput()">
+              <button type="button" class="button-add-person" (click)="addPersonFromInput()">Ajouter</button>
+            </div>
+          </div>
+
+          <h5>Ou choisir parmi les personnes disponibles :</h5>
+          <div class="available-people-for-edit-list"> <!-- Réutiliser la classe si le style est similaire -->
+            @for (person of getAvailablePeopleForSelection(); track person.id) {
+              <div class="person-item-to-add" (click)="addPersonToCurrentPromo(person)" title="Ajouter {{person.nom}} à la promo">
+                + {{ person.nom }} ({{person.email}})
+              </div>
+            } @empty {
+              <p>Toutes les personnes disponibles sont déjà dans cette promo.</p>
+            }
+          </div>
+        </div>
+
+        @if (formError) { <p class="error-message">{{ formError }}</p> }
+        @if (formSuccess) { <p class="success-message">{{ formSuccess }}</p> }
+
+        <div class="buttons modal-buttons">
+          <button type="button" class="button-secondary" (click)="closeCreateOrEditModal()">Annuler</button>
+          <button type="submit" class="button-primary">{{ isEditMode ? 'Enregistrer Modifications' : 'Créer Promo' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+} <!-- Fin modale création/modification de promo -->
+
+
+<!-- MODALE DE CONFIRMATION DE SUPPRESSION DE PROMO -->
+@if (isConfirmDeleteModalOpen && promoToDelete) {
+  <div class="modal-overlay confirm-delete-modal-overlay" (click)="closeConfirmDeletePromoModal()">
+    <div class="modal-content confirm-delete-modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close-button" (click)="closeConfirmDeletePromoModal()" aria-label="Fermer">×</button>
+      <div class="modal-header">
+        <h2>Confirmer la Suppression</h2>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer la promo "<strong>{{ promoToDelete.name }}</strong>" ?</p>
+        <p class="warning-text">Cette action est irréversible et la promo ne pourra plus être assignée à des briefs.</p>
+      </div>
+      <div class="modal-footer buttons confirm-delete-buttons">
+        <button type="button" class="button-secondary" (click)="closeConfirmDeletePromoModal()">Annuler</button>
+        <button type="button" class="button-danger" (click)="confirmDeletePromo()">Oui, Supprimer</button>
+      </div>
+    </div>
+  </div>
+} <!-- Fin modale suppression de promo -->
+
+<!-- MODALE POUR AFFICHER LES MEMBRES D'UNE PROMO -->
+@if (isPromoMembersModalOpen && selectedPromoForMembers) {
+  <div class="modal-overlay members-promo-modal-overlay" (click)="closePromoMembersModal()"> <!-- Classe overlay spécifique si besoin -->
+    <div class="modal-content members-promo-modal-content" (click)="$event.stopPropagation()"> <!-- Classe contenu spécifique -->
+      <button class="modal-close-button" (click)="closePromoMembersModal()" aria-label="Fermer">×</button>
+      <div class="modal-header">
+        <h2>Membres de la Promo : {{ selectedPromoForMembers.name }}</h2>
+      </div>
+      <div class="modal-body members-list-body"> <!-- Classe body spécifique -->
+        @if (selectedPromoForMembers.members && selectedPromoForMembers.members.length > 0) {
+          <ul class="members-ul"> <!-- Réutiliser les classes si le style est le même -->
+            @for (member of selectedPromoForMembers.members; track member.id) {
+              <li class="member-item">
+                <span class="member-name">{{ member.nom }}</span>
+                <div class="member-details">
+                  @if (member.email) { <span class="member-detail">Email: {{ member.email }}</span> }
+                  @if (member.genre) { <span class="member-detail">Genre: {{member.genre}}</span> }
+                  @if (member.aisanceFrancais) { <span class="member-detail">Français: N{{member.aisanceFrancais}}</span> }
+                  @if (member.ancienDWWM !== undefined) { <span class="member-detail">Ancien DWWM: {{member.ancienDWWM ? 'Oui' : 'Non'}}</span> }
+                  @if (member.niveauTechnique) { <span class="member-detail">N. Tech: N{{member.niveauTechnique}}</span> }
+                  @if (member.profil) { <span class="member-detail">Profil: {{member.profil}}</span> }
+                  @if (member.age) { <span class="member-detail">Âge: {{member.age}}</span> }
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p>Aucun membre dans cette promo.</p>
+        }
+      </div>
+      <div class="modal-footer buttons">
+        <button type="button" class="button-secondary" (click)="closePromoMembersModal()">Fermer</button>
+      </div>
+    </div>
+  </div>
+}
